@@ -9,15 +9,15 @@ const Dashboard = () => {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
-        <p className="text-gray-600 dark:text-gray-300">Welcome back! Here's your financial overview.</p>
+        <p className="text-gray-600 dark:text-gray-400">Welcome back! Here's your financial overview.</p>
       </div>
       
       <StatsCards />
       
       <div className="grid gap-6 lg:grid-cols-2">
         <RecentTransactions />
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
-          <h3 className="text-lg font-semibold mb-4 dark:text-white">Expense Breakdown</h3>
+        <div className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm p-6 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
+          <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Financial Overview</h3>
           <FinancialChart />
         </div>
       </div>

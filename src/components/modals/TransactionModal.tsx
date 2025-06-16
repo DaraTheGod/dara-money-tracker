@@ -1,23 +1,44 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from "@/components/ui/textarea"
+import { Calendar } from "@/components/ui/calendar"
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { useCategories, useCreateTransaction, useUpdateTransaction, type Transaction } from '@/hooks/useTransactions';
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+import { CalendarIcon } from "lucide-react"
+import { cn } from "@/lib/utils"
+import { useCategories, useCreateTransaction, useUpdateTransaction, Transaction } from '@/hooks/useTransactions';
+import { Category } from '@/hooks/useTransactions';
+import { format } from 'date-fns';
+import { toast } from "@/hooks/use-toast"
 import { convertCurrency } from '@/utils/currency';
+
+const FormSchema = z.object({
+  type: z.enum(['income', 'expense']),
+  amount: z.string().refine((val) => !isNaN(parseFloat(val)), {
+    message: "Amount must be a number.",
+  }),
+  currency: z.enum(['USD', 'KHR']),
+  category_id: z.string().nullable(),
+  description: z.string().optional(),
+  transaction_date: z.date(),
+});
 
 interface TransactionModalProps {
   isOpen: boolean;
@@ -26,187 +47,228 @@ interface TransactionModalProps {
   defaultType?: 'income' | 'expense';
 }
 
-const TransactionModal = ({ isOpen, onClose, transaction, defaultType = 'expense' }: TransactionModalProps) => {
-  const { data: categories = [] } = useCategories();
+const TransactionModal = ({ isOpen, onClose, transaction, defaultType }: TransactionModalProps) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { data: categories, isLoading: isLoadingCategories } = useCategories();
   const createTransaction = useCreateTransaction();
   const updateTransaction = useUpdateTransaction();
-  const [formData, setFormData] = useState({
-    type: defaultType as 'income' | 'expense',
-    amount: '',
-    currency: 'USD' as 'USD' | 'KHR',
-    category_id: '',
-    description: '',
-    transaction_date: new Date().toISOString().split('T')[0],
+
+  const form = useForm<z.infer<typeof FormSchema>>({
+    resolver: zodResolver(FormSchema),
+    defaultValues: {
+      type: defaultType || 'expense',
+      amount: transaction?.amount?.toString() || '',
+      currency: transaction?.currency || 'USD',
+      category_id: transaction?.category_id || null,
+      description: transaction?.description || '',
+      transaction_date: transaction ? new Date(transaction.transaction_date) : new Date(),
+    },
   });
 
-  useEffect(() => {
-    if (transaction) {
-      setFormData({
-        type: transaction.type,
-        amount: transaction.amount.toString(),
-        currency: transaction.currency,
-        category_id: transaction.category_id || '',
-        description: transaction.description || '',
-        transaction_date: transaction.transaction_date,
-      });
-    } else {
-      setFormData({
-        type: defaultType,
-        amount: '',
-        currency: 'USD',
-        category_id: '',
-        description: '',
-        transaction_date: new Date().toISOString().split('T')[0],
-      });
-    }
-  }, [transaction, defaultType]);
-
-  const handleCurrencyChange = (newCurrency: 'USD' | 'KHR') => {
-    if (formData.amount && formData.currency !== newCurrency) {
-      const currentAmount = parseFloat(formData.amount);
-      const convertedAmount = convertCurrency(currentAmount, formData.currency, newCurrency);
-      setFormData({
-        ...formData,
-        currency: newCurrency,
-        amount: convertedAmount.toString(),
-      });
-    } else {
-      setFormData({ ...formData, currency: newCurrency });
-    }
+  const handleClose = () => {
+    form.reset();
+    onClose();
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    const transactionData = {
-      ...formData,
-      amount: parseFloat(formData.amount),
-    };
-
+  const onSubmit = async (data: any) => {
     try {
+      let amount = parseFloat(data.amount);
+      
+      // Convert KHR to USD before saving
+      if (data.currency === 'KHR') {
+        amount = convertCurrency(amount, 'KHR', 'USD');
+      }
+      
+      const transactionData = {
+        type: data.type,
+        amount: amount, // Always save in USD
+        currency: 'USD' as const, // Always save as USD
+        category_id: data.category_id || null,
+        description: data.description,
+        transaction_date: data.transaction_date,
+      };
+
       if (transaction) {
-        await updateTransaction.mutateAsync({ id: transaction.id, ...transactionData });
+        await updateTransaction.mutateAsync({
+          id: transaction.id,
+          ...transactionData,
+        });
       } else {
         await createTransaction.mutateAsync(transactionData);
       }
-      onClose();
+
+      handleClose();
     } catch (error) {
       console.error('Failed to save transaction:', error);
     }
   };
 
+  if (!isOpen) return null;
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>
-            {transaction ? 'Edit Transaction' : 'Add New Transaction'}
-          </DialogTitle>
-        </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="type">Type</Label>
-            <Select value={formData.type} onValueChange={(value: 'income' | 'expense') => 
-              setFormData({ ...formData, type: value })
-            }>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="income">Income</SelectItem>
-                <SelectItem value="expense">Expense</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="amount">Amount</Label>
-              <Input
-                id="amount"
-                type="number"
-                step="0.01"
-                value={formData.amount}
-                onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                required
+    <div className="fixed inset-0 z-50 overflow-auto bg-black/50 flex items-center justify-center">
+      <div className="relative bg-white rounded-lg shadow-lg max-w-md w-full mx-4">
+        <div className="p-6">
+          <h2 className="text-lg font-semibold mb-4">
+            {transaction ? 'Edit Transaction' : 'Add Transaction'}
+          </h2>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="type"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Type</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a type" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="income">Income</SelectItem>
+                        <SelectItem value="expense">Expense</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="currency">Currency</Label>
-              <Select value={formData.currency} onValueChange={handleCurrencyChange}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="USD">USD</SelectItem>
-                  <SelectItem value="KHR">KHR</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          {formData.currency === 'KHR' && formData.amount && (
-            <div className="text-sm text-gray-500">
-              ≈ ${(parseFloat(formData.amount) / 4000).toFixed(2)} USD
-            </div>
-          )}
-
-          {formData.currency === 'USD' && formData.amount && (
-            <div className="text-sm text-gray-500">
-              ≈ {(parseFloat(formData.amount) * 4000).toLocaleString()} KHR
-            </div>
-          )}
-
-          <div className="space-y-2">
-            <Label htmlFor="category">Category</Label>
-            <Select value={formData.category_id} onValueChange={(value) => 
-              setFormData({ ...formData, category_id: value })
-            }>
-              <SelectTrigger>
-                <SelectValue placeholder="Select category" />
-              </SelectTrigger>
-              <SelectContent>
-                {categories.map((category) => (
-                  <SelectItem key={category.id} value={category.id}>
-                    {category.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              placeholder="Optional description"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="date">Date</Label>
-            <Input
-              id="date"
-              type="date"
-              value={formData.transaction_date}
-              onChange={(e) => setFormData({ ...formData, transaction_date: e.target.value })}
-              required
-            />
-          </div>
-
-          <div className="flex justify-end space-x-2">
-            <Button type="button" variant="outline" onClick={onClose}>
-              Cancel
-            </Button>
-            <Button type="submit">
-              {transaction ? 'Update' : 'Create'} Transaction
-            </Button>
-          </div>
-        </form>
-      </DialogContent>
-    </Dialog>
+              <FormField
+                control={form.control}
+                name="amount"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Amount</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Amount" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="currency"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Currency</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a currency" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="USD">USD</SelectItem>
+                        <SelectItem value="KHR">KHR</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="category_id"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Category</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value || ''} disabled={isLoadingCategories}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a category" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {categories?.map(category => (
+                          <SelectItem key={category.id} value={category.id}>{category.name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Description</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Description"
+                        className="resize-none"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="transaction_date"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
+                    <FormLabel>Transaction Date</FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant={"outline"}
+                            className={cn(
+                              "w-[240px] pl-3 text-left font-normal",
+                              !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            {field.value ? (
+                              format(field.value, "PPP")
+                            ) : (
+                              <span>Pick a date</span>
+                            )}
+                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={field.value}
+                          onSelect={field.onChange}
+                          disabled={(date) =>
+                            date > new Date()
+                          }
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div className="flex justify-end space-x-2">
+                <Button
+                  variant="ghost"
+                  onClick={handleClose}
+                  disabled={isSubmitting}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? 'Saving...' : 'Save'}
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </div>
+      </div>
+    </div>
   );
 };
 

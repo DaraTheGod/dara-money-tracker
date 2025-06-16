@@ -28,32 +28,35 @@ const Expenses = () => {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Expenses</h1>
-          <p className="text-gray-600">Track and manage your expenses</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Expenses</h1>
+          <p className="text-gray-600 dark:text-gray-400">Track and manage your expenses</p>
         </div>
-        <Button onClick={() => setIsModalOpen(true)} className="w-full sm:w-auto">
+        <Button 
+          onClick={() => setIsModalOpen(true)} 
+          className="w-full sm:w-auto bg-red-500 hover:bg-red-600 shadow-lg shadow-red-500/25"
+        >
           <Plus className="h-4 w-4 mr-2" />
           Add Expense
         </Button>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <Card>
+      <div className="grid gap-6 lg:grid-cols-2 xl:grid-cols-5">
+        <Card className="lg:col-span-1 xl:col-span-2 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border-gray-200 dark:border-gray-700">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-lg font-semibold">Recent Expenses</CardTitle>
+            <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">Recent Expenses</CardTitle>
             <TrendingDown className="h-5 w-5 text-red-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-red-600 mb-4">
-              {formatCurrency(totalExpenses)}
+              {formatCurrency(totalExpenses, 'USD')}
             </div>
             <ExpenseList />
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="lg:col-span-1 xl:col-span-3 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border-gray-200 dark:border-gray-700">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-lg font-semibold">Expense Trends</CardTitle>
+            <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">Expense Trends</CardTitle>
             <div className="flex items-center space-x-2">
               <Button
                 variant={chartType === 'bar' ? 'default' : 'outline'}
