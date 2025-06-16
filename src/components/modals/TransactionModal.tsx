@@ -17,6 +17,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useCategories, useCreateTransaction, useUpdateTransaction, type Transaction } from '@/hooks/useTransactions';
+import { convertCurrency } from '@/utils/currency';
 
 interface TransactionModalProps {
   isOpen: boolean;
@@ -59,6 +60,20 @@ const TransactionModal = ({ isOpen, onClose, transaction, defaultType = 'expense
       });
     }
   }, [transaction, defaultType]);
+
+  const handleCurrencyChange = (newCurrency: 'USD' | 'KHR') => {
+    if (formData.amount && formData.currency !== newCurrency) {
+      const currentAmount = parseFloat(formData.amount);
+      const convertedAmount = convertCurrency(currentAmount, formData.currency, newCurrency);
+      setFormData({
+        ...formData,
+        currency: newCurrency,
+        amount: convertedAmount.toString(),
+      });
+    } else {
+      setFormData({ ...formData, currency: newCurrency });
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -118,9 +133,7 @@ const TransactionModal = ({ isOpen, onClose, transaction, defaultType = 'expense
             </div>
             <div className="space-y-2">
               <Label htmlFor="currency">Currency</Label>
-              <Select value={formData.currency} onValueChange={(value: 'USD' | 'KHR') => 
-                setFormData({ ...formData, currency: value })
-              }>
+              <Select value={formData.currency} onValueChange={handleCurrencyChange}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -131,6 +144,18 @@ const TransactionModal = ({ isOpen, onClose, transaction, defaultType = 'expense
               </Select>
             </div>
           </div>
+
+          {formData.currency === 'KHR' && formData.amount && (
+            <div className="text-sm text-gray-500">
+              ≈ ${(parseFloat(formData.amount) / 4000).toFixed(2)} USD
+            </div>
+          )}
+
+          {formData.currency === 'USD' && formData.amount && (
+            <div className="text-sm text-gray-500">
+              ≈ {(parseFloat(formData.amount) * 4000).toLocaleString()} KHR
+            </div>
+          )}
 
           <div className="space-y-2">
             <Label htmlFor="category">Category</Label>

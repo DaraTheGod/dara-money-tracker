@@ -46,7 +46,7 @@ export const useTransactions = (type?: 'income' | 'expense', limit?: number) => 
           )
         `)
         .eq('user_id', user.id)
-        .order('transaction_date', { ascending: false });
+        .order('created_at', { ascending: false }); // Changed to order by created_at descending
 
       if (type) {
         query = query.eq('type', type);
