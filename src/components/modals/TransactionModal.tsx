@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import {
   Dialog,
@@ -23,14 +22,15 @@ interface TransactionModalProps {
   isOpen: boolean;
   onClose: () => void;
   transaction?: Transaction | null;
+  defaultType?: 'income' | 'expense';
 }
 
-const TransactionModal = ({ isOpen, onClose, transaction }: TransactionModalProps) => {
+const TransactionModal = ({ isOpen, onClose, transaction, defaultType = 'expense' }: TransactionModalProps) => {
   const { data: categories = [] } = useCategories();
   const createTransaction = useCreateTransaction();
   const updateTransaction = useUpdateTransaction();
   const [formData, setFormData] = useState({
-    type: 'expense' as 'income' | 'expense',
+    type: defaultType as 'income' | 'expense',
     amount: '',
     currency: 'USD' as 'USD' | 'KHR',
     category_id: '',
@@ -50,7 +50,7 @@ const TransactionModal = ({ isOpen, onClose, transaction }: TransactionModalProp
       });
     } else {
       setFormData({
-        type: 'expense',
+        type: defaultType,
         amount: '',
         currency: 'USD',
         category_id: '',
@@ -58,7 +58,7 @@ const TransactionModal = ({ isOpen, onClose, transaction }: TransactionModalProp
         transaction_date: new Date().toISOString().split('T')[0],
       });
     }
-  }, [transaction]);
+  }, [transaction, defaultType]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
