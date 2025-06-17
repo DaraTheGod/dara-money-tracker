@@ -59,7 +59,7 @@ const ProfileSettings = () => {
       
       // Create a unique filename
       const fileExt = file.name.split('.').pop();
-      const fileName = `${user?.id}-${Date.now()}.${fileExt}`;
+      const fileName = `${user?.id}/${Date.now()}.${fileExt}`;
       
       // Upload to Supabase Storage
       const { data, error } = await supabase.storage
@@ -94,7 +94,23 @@ const ProfileSettings = () => {
     }
   };
 
-  const handleFileRemove = () => {
+  const handleFileRemove = async () => {
+    if (profile.profile_image) {
+      try {
+        // Extract filename from URL
+        const url = new URL(profile.profile_image);
+        const fileName = url.pathname.split('/').pop();
+        
+        if (fileName) {
+          await supabase.storage
+            .from('avatars')
+            .remove([`${user?.id}/${fileName}`]);
+        }
+      } catch (error) {
+        console.error('Error removing file:', error);
+      }
+    }
+    
     setProfile(prev => ({ ...prev, profile_image: '' }));
   };
 
