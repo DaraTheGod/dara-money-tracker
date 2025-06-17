@@ -26,6 +26,7 @@ import { cn } from "@/lib/utils"
 import { useCategories, useCreateTransaction, useUpdateTransaction, Transaction, useTransactions } from '@/hooks/useTransactions';
 import { format } from 'date-fns';
 import { useToast } from "@/hooks/use-toast"
+import { calculateDualCurrencyBalances } from '@/utils/currency';
 
 const FormSchema = z.object({
   type: z.enum(['income', 'expense']),
@@ -60,7 +61,7 @@ const TransactionModal = ({ isOpen, onClose, transaction, defaultType }: Transac
       type: defaultType || 'expense',
       amount: '',
       currency: 'USD',
-      category_id: null,
+      category_id: '',
       description: '',
       transaction_date: new Date(),
     },
@@ -74,7 +75,7 @@ const TransactionModal = ({ isOpen, onClose, transaction, defaultType }: Transac
           type: transaction.type,
           amount: transaction.amount?.toString() || '',
           currency: transaction.currency as 'USD' | 'KHR',
-          category_id: transaction.category_id || null,
+          category_id: transaction.category_id || '',
           description: transaction.description || '',
           transaction_date: transaction ? new Date(transaction.transaction_date) : new Date(),
         });
@@ -83,7 +84,7 @@ const TransactionModal = ({ isOpen, onClose, transaction, defaultType }: Transac
           type: defaultType || 'expense',
           amount: '',
           currency: 'USD',
-          category_id: null,
+          category_id: '',
           description: '',
           transaction_date: new Date(),
         });
@@ -93,17 +94,7 @@ const TransactionModal = ({ isOpen, onClose, transaction, defaultType }: Transac
   }, [isOpen, transaction, defaultType, form]);
 
   // Calculate current balances by currency
-  const balanceUSD = transactions
-    .filter(t => t.currency === 'USD')
-    .reduce((balance, t) => {
-      return t.type === 'income' ? balance + Number(t.amount) : balance - Number(t.amount);
-    }, 0);
-
-  const balanceKHR = transactions
-    .filter(t => t.currency === 'KHR')
-    .reduce((balance, t) => {
-      return t.type === 'income' ? balance + Number(t.amount) : balance - Number(t.amount);
-    }, 0);
+  const { balanceUSD, balanceKHR } = calculateDualCurrencyBalances(transactions);
 
   // Check balance when amount or currency changes
   useEffect(() => {
@@ -215,16 +206,16 @@ const TransactionModal = ({ isOpen, onClose, transaction, defaultType }: Transac
                 name="type"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Type</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormLabel className="text-gray-700 dark:text-gray-300">Type</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
-                        <SelectTrigger className="bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+                        <SelectTrigger className="bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100">
                           <SelectValue placeholder="Select a type" />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
-                        <SelectItem value="income">Income</SelectItem>
-                        <SelectItem value="expense">Expense</SelectItem>
+                      <SelectContent className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 z-[110]">
+                        <SelectItem value="income" className="text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700">Income</SelectItem>
+                        <SelectItem value="expense" className="text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700">Expense</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -238,9 +229,13 @@ const TransactionModal = ({ isOpen, onClose, transaction, defaultType }: Transac
                   name="amount"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Amount</FormLabel>
+                      <FormLabel className="text-gray-700 dark:text-gray-300">Amount</FormLabel>
                       <FormControl>
-                        <Input placeholder="0.00" {...field} className="bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700" />
+                        <Input 
+                          placeholder="0.00" 
+                          {...field} 
+                          className="bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400" 
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -252,16 +247,16 @@ const TransactionModal = ({ isOpen, onClose, transaction, defaultType }: Transac
                   name="currency"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Currency</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormLabel className="text-gray-700 dark:text-gray-300">Currency</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
-                          <SelectTrigger className="bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+                          <SelectTrigger className="bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100">
                             <SelectValue placeholder="Currency" />
                           </SelectTrigger>
                         </FormControl>
-                        <SelectContent className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
-                          <SelectItem value="USD">USD</SelectItem>
-                          <SelectItem value="KHR">KHR</SelectItem>
+                        <SelectContent className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 z-[110]">
+                          <SelectItem value="USD" className="text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700">USD</SelectItem>
+                          <SelectItem value="KHR" className="text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700">KHR</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -275,16 +270,22 @@ const TransactionModal = ({ isOpen, onClose, transaction, defaultType }: Transac
                 name="category_id"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Category</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value || ''} disabled={isLoadingCategories}>
+                    <FormLabel className="text-gray-700 dark:text-gray-300">Category</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value} disabled={isLoadingCategories}>
                       <FormControl>
-                        <SelectTrigger className="bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+                        <SelectTrigger className="bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100">
                           <SelectValue placeholder="Select a category" />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+                      <SelectContent className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 z-[110]">
                         {categories?.map(category => (
-                          <SelectItem key={category.id} value={category.id}>{category.name}</SelectItem>
+                          <SelectItem 
+                            key={category.id} 
+                            value={category.id}
+                            className="text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700"
+                          >
+                            {category.name}
+                          </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
@@ -298,11 +299,11 @@ const TransactionModal = ({ isOpen, onClose, transaction, defaultType }: Transac
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Description</FormLabel>
+                    <FormLabel className="text-gray-700 dark:text-gray-300">Description</FormLabel>
                     <FormControl>
                       <Textarea
                         placeholder="Description"
-                        className="resize-none bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700"
+                        className="resize-none bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400"
                         {...field}
                       />
                     </FormControl>
@@ -316,14 +317,14 @@ const TransactionModal = ({ isOpen, onClose, transaction, defaultType }: Transac
                 name="transaction_date"
                 render={({ field }) => (
                   <FormItem className="flex flex-col">
-                    <FormLabel>Transaction Date</FormLabel>
+                    <FormLabel className="text-gray-700 dark:text-gray-300">Transaction Date</FormLabel>
                     <Popover>
                       <PopoverTrigger asChild>
                         <FormControl>
                           <Button
                             variant={"outline"}
                             className={cn(
-                              "w-full pl-3 text-left font-normal bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700",
+                              "w-full pl-3 text-left font-normal bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100",
                               !field.value && "text-muted-foreground"
                             )}
                           >
@@ -336,13 +337,14 @@ const TransactionModal = ({ isOpen, onClose, transaction, defaultType }: Transac
                           </Button>
                         </FormControl>
                       </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700" align="start">
+                      <PopoverContent className="w-auto p-0 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 z-[110]" align="start">
                         <Calendar
                           mode="single"
                           selected={field.value}
                           onSelect={field.onChange}
                           disabled={(date) => date > new Date()}
                           initialFocus
+                          className="text-gray-900 dark:text-gray-100"
                         />
                       </PopoverContent>
                     </Popover>
@@ -356,7 +358,7 @@ const TransactionModal = ({ isOpen, onClose, transaction, defaultType }: Transac
                   variant="outline"
                   onClick={handleClose}
                   disabled={isSubmitting}
-                  className="hover:bg-gray-100 dark:hover:bg-gray-800"
+                  className="hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-200 dark:border-gray-700"
                 >
                   Cancel
                 </Button>
