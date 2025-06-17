@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -21,18 +21,17 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import { CalendarIcon } from "lucide-react"
+import { CalendarIcon, AlertTriangle } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { useCategories, useCreateTransaction, useUpdateTransaction, Transaction } from '@/hooks/useTransactions';
-import { Category } from '@/hooks/useTransactions';
+import { useCategories, useCreateTransaction, useUpdateTransaction, Transaction, useTransactions } from '@/hooks/useTransactions';
 import { format } from 'date-fns';
-import { toast } from "@/hooks/use-toast"
-import { convertCurrency } from '@/utils/currency';
+import { useToast } from "@/hooks/use-toast"
+import { convertCurrency, checkSufficientBalance, formatCurrency } from '@/utils/currency';
 
 const FormSchema = z.object({
   type: z.enum(['income', 'expense']),
-  amount: z.string().refine((val) => !isNaN(parseFloat(val)), {
-    message: "Amount must be a number.",
+  amount: z.string().refine((val) => !isNaN(parseFloat(val)) && parseFloat(val) > 0, {
+    message: "Amount must be a positive number.",
   }),
   currency: z.enum(['USD', 'KHR']),
   category_id: z.string().nullable(),
@@ -49,40 +48,110 @@ interface TransactionModalProps {
 
 const TransactionModal = ({ isOpen, onClose, transaction, defaultType }: TransactionModalProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [balanceWarning, setBalanceWarning] = useState<string>('');
   const { data: categories, isLoading: isLoadingCategories } = useCategories();
+  const { data: transactions = [] } = useTransactions();
   const createTransaction = useCreateTransaction();
   const updateTransaction = useUpdateTransaction();
+  const { toast } = useToast();
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
       type: defaultType || 'expense',
-      amount: transaction?.amount?.toString() || '',
-      currency: transaction?.currency || 'USD',
-      category_id: transaction?.category_id || null,
-      description: transaction?.description || '',
-      transaction_date: transaction ? new Date(transaction.transaction_date) : new Date(),
+      amount: '',
+      currency: 'USD',
+      category_id: null,
+      description: '',
+      transaction_date: new Date(),
     },
   });
 
+  // Reset form when modal opens with transaction data
+  useEffect(() => {
+    if (isOpen) {
+      if (transaction) {
+        form.reset({
+          type: transaction.type,
+          amount: transaction.amount?.toString() || '',
+          currency: 'USD', // Always show USD as it's stored in USD
+          category_id: transaction.category_id || null,
+          description: transaction.description || '',
+          transaction_date: transaction ? new Date(transaction.transaction_date) : new Date(),
+        });
+      } else {
+        form.reset({
+          type: defaultType || 'expense',
+          amount: '',
+          currency: 'USD',
+          category_id: null,
+          description: '',
+          transaction_date: new Date(),
+        });
+      }
+      setBalanceWarning('');
+    }
+  }, [isOpen, transaction, defaultType, form]);
+
+  // Calculate current balance
+  const currentBalance = transactions.reduce((balance, t) => {
+    return t.type === 'income' ? balance + Number(t.amount) : balance - Number(t.amount);
+  }, 0);
+
+  // Check balance when amount or currency changes
+  useEffect(() => {
+    const subscription = form.watch((value, { name }) => {
+      if ((name === 'amount' || name === 'currency' || name === 'type') && value.type === 'expense' && value.amount) {
+        const amount = parseFloat(value.amount);
+        if (!isNaN(amount) && amount > 0) {
+          const balanceCheck = checkSufficientBalance(currentBalance, amount, value.currency as 'USD' | 'KHR');
+          if (!balanceCheck.sufficient) {
+            setBalanceWarning(balanceCheck.message || '');
+          } else {
+            setBalanceWarning('');
+          }
+        }
+      } else {
+        setBalanceWarning('');
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [form, currentBalance]);
+
   const handleClose = () => {
     form.reset();
+    setBalanceWarning('');
     onClose();
   };
 
   const onSubmit = async (data: any) => {
+    // Check balance for expenses
+    if (data.type === 'expense') {
+      const amount = parseFloat(data.amount);
+      const balanceCheck = checkSufficientBalance(currentBalance, amount, data.currency);
+      if (!balanceCheck.sufficient) {
+        toast({
+          title: "Insufficient Balance",
+          description: balanceCheck.message,
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+
     try {
+      setIsSubmitting(true);
       let amount = parseFloat(data.amount);
       
-      // Convert KHR to USD before saving
+      // Convert to USD before saving (always store in USD)
       if (data.currency === 'KHR') {
         amount = convertCurrency(amount, 'KHR', 'USD');
       }
       
       const transactionData = {
         type: data.type,
-        amount: amount, // Always save in USD
-        currency: 'USD' as const, // Always save as USD
+        amount: amount,
+        currency: 'USD' as const,
         category_id: data.category_id || null,
         description: data.description,
         transaction_date: data.transaction_date,
@@ -95,23 +164,36 @@ const TransactionModal = ({ isOpen, onClose, transaction, defaultType }: Transac
         });
       } else {
         await createTransaction.mutateAsync(transactionData);
+        
+        // Dispatch custom event for auto-refresh
+        window.dispatchEvent(new Event('transactionAdded'));
       }
 
       handleClose();
     } catch (error) {
       console.error('Failed to save transaction:', error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-auto bg-black/50 flex items-center justify-center">
-      <div className="relative bg-white rounded-lg shadow-lg max-w-md w-full mx-4">
+    <div className="fixed inset-0 z-50 overflow-auto bg-black/50 flex items-center justify-center backdrop-blur-sm">
+      <div className="relative glass-effect rounded-xl shadow-2xl max-w-md w-full mx-4 border-none">
         <div className="p-6">
-          <h2 className="text-lg font-semibold mb-4">
+          <h2 className="text-xl font-semibold mb-6 text-gray-900 dark:text-white">
             {transaction ? 'Edit Transaction' : 'Add Transaction'}
           </h2>
+          
+          {balanceWarning && (
+            <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg flex items-center space-x-2">
+              <AlertTriangle className="h-4 w-4 text-red-600 dark:text-red-400" />
+              <span className="text-sm text-red-700 dark:text-red-300">{balanceWarning}</span>
+            </div>
+          )}
+
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <FormField
@@ -122,11 +204,11 @@ const TransactionModal = ({ isOpen, onClose, transaction, defaultType }: Transac
                     <FormLabel>Type</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
-                        <SelectTrigger>
+                        <SelectTrigger className="glass-effect border-none">
                           <SelectValue placeholder="Select a type" />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent>
+                      <SelectContent className="glass-effect border-none">
                         <SelectItem value="income">Income</SelectItem>
                         <SelectItem value="expense">Expense</SelectItem>
                       </SelectContent>
@@ -135,40 +217,45 @@ const TransactionModal = ({ isOpen, onClose, transaction, defaultType }: Transac
                   </FormItem>
                 )}
               />
-              <FormField
-                control={form.control}
-                name="amount"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Amount</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Amount" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="currency"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Currency</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="amount"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Amount</FormLabel>
                       <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a currency" />
-                        </SelectTrigger>
+                        <Input placeholder="0.00" {...field} className="glass-effect border-none" />
                       </FormControl>
-                      <SelectContent>
-                        <SelectItem value="USD">USD</SelectItem>
-                        <SelectItem value="KHR">KHR</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="currency"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Currency</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger className="glass-effect border-none">
+                            <SelectValue placeholder="Currency" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent className="glass-effect border-none">
+                          <SelectItem value="USD">USD</SelectItem>
+                          <SelectItem value="KHR">KHR</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
               <FormField
                 control={form.control}
                 name="category_id"
@@ -177,11 +264,11 @@ const TransactionModal = ({ isOpen, onClose, transaction, defaultType }: Transac
                     <FormLabel>Category</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value || ''} disabled={isLoadingCategories}>
                       <FormControl>
-                        <SelectTrigger>
+                        <SelectTrigger className="glass-effect border-none">
                           <SelectValue placeholder="Select a category" />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent>
+                      <SelectContent className="glass-effect border-none">
                         {categories?.map(category => (
                           <SelectItem key={category.id} value={category.id}>{category.name}</SelectItem>
                         ))}
@@ -191,6 +278,7 @@ const TransactionModal = ({ isOpen, onClose, transaction, defaultType }: Transac
                   </FormItem>
                 )}
               />
+
               <FormField
                 control={form.control}
                 name="description"
@@ -200,7 +288,7 @@ const TransactionModal = ({ isOpen, onClose, transaction, defaultType }: Transac
                     <FormControl>
                       <Textarea
                         placeholder="Description"
-                        className="resize-none"
+                        className="resize-none glass-effect border-none"
                         {...field}
                       />
                     </FormControl>
@@ -208,6 +296,7 @@ const TransactionModal = ({ isOpen, onClose, transaction, defaultType }: Transac
                   </FormItem>
                 )}
               />
+
               <FormField
                 control={form.control}
                 name="transaction_date"
@@ -220,7 +309,7 @@ const TransactionModal = ({ isOpen, onClose, transaction, defaultType }: Transac
                           <Button
                             variant={"outline"}
                             className={cn(
-                              "w-[240px] pl-3 text-left font-normal",
+                              "w-full pl-3 text-left font-normal glass-effect border-none",
                               !field.value && "text-muted-foreground"
                             )}
                           >
@@ -233,14 +322,12 @@ const TransactionModal = ({ isOpen, onClose, transaction, defaultType }: Transac
                           </Button>
                         </FormControl>
                       </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
+                      <PopoverContent className="w-auto p-0 glass-effect border-none" align="start">
                         <Calendar
                           mode="single"
                           selected={field.value}
                           onSelect={field.onChange}
-                          disabled={(date) =>
-                            date > new Date()
-                          }
+                          disabled={(date) => date > new Date()}
                           initialFocus
                         />
                       </PopoverContent>
@@ -249,17 +336,20 @@ const TransactionModal = ({ isOpen, onClose, transaction, defaultType }: Transac
                   </FormItem>
                 )}
               />
-              <div className="flex justify-end space-x-2">
+
+              <div className="flex justify-end space-x-2 pt-4">
                 <Button
                   variant="ghost"
                   onClick={handleClose}
                   disabled={isSubmitting}
+                  className="hover:bg-gray-100 dark:hover:bg-gray-800"
                 >
                   Cancel
                 </Button>
                 <Button
                   type="submit"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || !!balanceWarning}
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
                 >
                   {isSubmitting ? 'Saving...' : 'Save'}
                 </Button>

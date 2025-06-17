@@ -11,13 +11,13 @@ const RecentTransactions = () => {
 
   return (
     <>
-      <Card className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border-gray-200 dark:border-gray-700">
+      <Card className="glass-effect border-none shadow-lg">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="text-gray-900 dark:text-white">Recent Transactions</CardTitle>
           <Button 
             onClick={() => setIsAddModalOpen(true)} 
             size="sm"
-            className="bg-blue-500 hover:bg-blue-600 shadow-lg shadow-blue-500/25"
+            className="bg-blue-600 hover:bg-blue-700 shadow-lg text-white"
           >
             <Plus className="h-4 w-4 mr-2" />
             Add Transaction

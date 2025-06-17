@@ -10,6 +10,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import FileUpload from '@/components/ui/file-upload';
 
 const ProfileSettings = () => {
   const { user, signOut } = useAuth();
@@ -50,6 +51,51 @@ const ProfileSettings = () => {
     } catch (error) {
       console.error('Error fetching profile:', error);
     }
+  };
+
+  const handleFileSelect = async (file: File) => {
+    try {
+      setLoading(true);
+      
+      // Create a unique filename
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user?.id}-${Date.now()}.${fileExt}`;
+      
+      // Upload to Supabase Storage
+      const { data, error } = await supabase.storage
+        .from('avatars')
+        .upload(fileName, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
+
+      if (error) throw error;
+
+      // Get public URL
+      const { data: urlData } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(fileName);
+
+      setProfile(prev => ({ ...prev, profile_image: urlData.publicUrl }));
+      
+      toast({
+        title: "Success",
+        description: "Profile image uploaded successfully.",
+      });
+    } catch (error) {
+      console.error('Error uploading file:', error);
+      toast({
+        title: "Error",
+        description: "Failed to upload profile image.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleFileRemove = () => {
+    setProfile(prev => ({ ...prev, profile_image: '' }));
   };
 
   const updateProfile = async () => {
@@ -95,14 +141,19 @@ const ProfileSettings = () => {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <Card>
+        <Card className="glass-effect border-none shadow-lg">
           <CardHeader>
             <CardTitle>Personal Information</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
-              <Input id="email" value={user?.email || ''} disabled />
+              <Input 
+                id="email" 
+                value={user?.email || ''} 
+                disabled 
+                className="glass-effect border-none"
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="username">Username</Label>
@@ -110,21 +161,23 @@ const ProfileSettings = () => {
                 id="username"
                 value={profile.username}
                 onChange={(e) => setProfile({ ...profile, username: e.target.value })}
+                className="glass-effect border-none"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="profile_image">Profile Image URL</Label>
-              <Input
-                id="profile_image"
-                value={profile.profile_image}
-                onChange={(e) => setProfile({ ...profile, profile_image: e.target.value })}
-                placeholder="https://example.com/avatar.jpg"
+              <Label>Profile Image</Label>
+              <FileUpload
+                onFileSelect={handleFileSelect}
+                onFileRemove={handleFileRemove}
+                currentFile={profile.profile_image}
+                accept="image/*"
+                maxSize={5}
               />
             </div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="glass-effect border-none shadow-lg">
           <CardHeader>
             <CardTitle>Preferences</CardTitle>
           </CardHeader>
@@ -147,10 +200,10 @@ const ProfileSettings = () => {
                 value={profile.preferred_currency} 
                 onValueChange={(value) => setProfile({ ...profile, preferred_currency: value })}
               >
-                <SelectTrigger>
+                <SelectTrigger className="glass-effect border-none">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="glass-effect border-none">
                   <SelectItem value="USD">USD - US Dollar</SelectItem>
                   <SelectItem value="KHR">KHR - Cambodian Riel</SelectItem>
                 </SelectContent>
@@ -161,7 +214,11 @@ const ProfileSettings = () => {
       </div>
 
       <div className="flex justify-between">
-        <Button onClick={updateProfile} disabled={loading}>
+        <Button 
+          onClick={updateProfile} 
+          disabled={loading}
+          className="bg-blue-600 hover:bg-blue-700 text-white"
+        >
           {loading ? 'Saving...' : 'Save Changes'}
         </Button>
         <Button variant="destructive" onClick={handleSignOut}>

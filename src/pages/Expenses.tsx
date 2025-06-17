@@ -2,13 +2,13 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Plus, Filter, TrendingDown, BarChart3, LineChart } from 'lucide-react';
+import { Plus, TrendingDown, BarChart3, LineChart } from 'lucide-react';
 import { useTransactions } from '@/hooks/useTransactions';
 import ExpenseList from '@/components/expenses/ExpenseList';
 import ExpenseChart from '@/components/expenses/ExpenseChart';
 import TransactionModal from '@/components/modals/TransactionModal';
 import FilterDropdown from '@/components/common/FilterDropdown';
-import { formatCurrency } from '@/utils/currency';
+import DualCurrencyDisplay from '@/components/common/DualCurrencyDisplay';
 
 const Expenses = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -27,7 +27,7 @@ const Expenses = () => {
         </div>
         <Button 
           onClick={() => setIsModalOpen(true)} 
-          className="w-full sm:w-auto bg-red-500 hover:bg-red-600 shadow-lg shadow-red-500/25"
+          className="w-full sm:w-auto bg-red-600 hover:bg-red-700 shadow-lg text-white"
         >
           <Plus className="h-4 w-4 mr-2" />
           Add Expense
@@ -35,20 +35,20 @@ const Expenses = () => {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2 xl:grid-cols-5">
-        <Card className="lg:col-span-1 xl:col-span-2 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border-gray-200 dark:border-gray-700">
+        <Card className="lg:col-span-1 xl:col-span-2 glass-effect border-none shadow-lg">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">Recent Expenses</CardTitle>
-            <TrendingDown className="h-5 w-5 text-red-600" />
+            <TrendingDown className="h-5 w-5 text-red-600 dark:text-red-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-red-600 mb-4">
-              {formatCurrency(totalExpenses, 'USD')}
+            <div className="mb-4">
+              <DualCurrencyDisplay usdAmount={totalExpenses} color="danger" size="lg" />
             </div>
             <ExpenseList />
           </CardContent>
         </Card>
 
-        <Card className="lg:col-span-1 xl:col-span-3 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border-gray-200 dark:border-gray-700">
+        <Card className="lg:col-span-1 xl:col-span-3 glass-effect border-none shadow-lg">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">Expense Trends</CardTitle>
             <div className="flex items-center space-x-2">
@@ -56,6 +56,7 @@ const Expenses = () => {
                 variant={chartType === 'bar' ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => setChartType('bar')}
+                className="h-8 w-8 p-0"
               >
                 <BarChart3 className="h-4 w-4" />
               </Button>
@@ -63,6 +64,7 @@ const Expenses = () => {
                 variant={chartType === 'line' ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => setChartType('line')}
+                className="h-8 w-8 p-0"
               >
                 <LineChart className="h-4 w-4" />
               </Button>

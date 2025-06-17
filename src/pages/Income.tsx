@@ -8,7 +8,7 @@ import IncomeList from '@/components/income/IncomeList';
 import IncomeChart from '@/components/income/IncomeChart';
 import TransactionModal from '@/components/modals/TransactionModal';
 import FilterDropdown from '@/components/common/FilterDropdown';
-import { formatCurrency } from '@/utils/currency';
+import DualCurrencyDisplay from '@/components/common/DualCurrencyDisplay';
 
 const Income = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -27,7 +27,7 @@ const Income = () => {
         </div>
         <Button 
           onClick={() => setIsModalOpen(true)} 
-          className="w-full sm:w-auto bg-green-500 hover:bg-green-600 shadow-lg shadow-green-500/25"
+          className="w-full sm:w-auto bg-green-600 hover:bg-green-700 shadow-lg text-white"
         >
           <Plus className="h-4 w-4 mr-2" />
           Add Income
@@ -35,20 +35,20 @@ const Income = () => {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2 xl:grid-cols-5">
-        <Card className="lg:col-span-1 xl:col-span-2 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border-gray-200 dark:border-gray-700">
+        <Card className="lg:col-span-1 xl:col-span-2 glass-effect border-none shadow-lg">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">Recent Income</CardTitle>
-            <TrendingUp className="h-5 w-5 text-green-600" />
+            <TrendingUp className="h-5 w-5 text-green-600 dark:text-green-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600 mb-4">
-              {formatCurrency(totalIncome, 'USD')}
+            <div className="mb-4">
+              <DualCurrencyDisplay usdAmount={totalIncome} color="success" size="lg" />
             </div>
             <IncomeList />
           </CardContent>
         </Card>
 
-        <Card className="lg:col-span-1 xl:col-span-3 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border-gray-200 dark:border-gray-700">
+        <Card className="lg:col-span-1 xl:col-span-3 glass-effect border-none shadow-lg">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">Income Trends</CardTitle>
             <div className="flex items-center space-x-2">
@@ -56,6 +56,7 @@ const Income = () => {
                 variant={chartType === 'bar' ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => setChartType('bar')}
+                className="h-8 w-8 p-0"
               >
                 <BarChart3 className="h-4 w-4" />
               </Button>
@@ -63,6 +64,7 @@ const Income = () => {
                 variant={chartType === 'line' ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => setChartType('line')}
+                className="h-8 w-8 p-0"
               >
                 <LineChart className="h-4 w-4" />
               </Button>

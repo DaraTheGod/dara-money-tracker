@@ -3,6 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DollarSign, TrendingUp, TrendingDown, Wallet } from 'lucide-react';
 import { useTransactions } from '@/hooks/useTransactions';
+import DualCurrencyDisplay from '@/components/common/DualCurrencyDisplay';
 
 const StatsCards = () => {
   const { data: transactions = [] } = useTransactions();
@@ -17,48 +18,47 @@ const StatsCards = () => {
 
   const totalBalance = totalIncome - totalExpenses;
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    }).format(amount);
-  };
-
   return (
-    <div className="grid gap-4 md:grid-cols-3">
-      <Card>
+    <div className="grid gap-6 md:grid-cols-3">
+      <Card className="glass-effect card-hover border-none shadow-lg">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Total Balance</CardTitle>
-          <Wallet className="h-4 w-4 text-muted-foreground" />
+          <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Balance</CardTitle>
+          <Wallet className="h-5 w-5 text-blue-600 dark:text-blue-400" />
         </CardHeader>
         <CardContent>
-          <div className={`text-2xl font-bold ${totalBalance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-            {formatCurrency(totalBalance)}
-          </div>
+          <DualCurrencyDisplay 
+            usdAmount={totalBalance} 
+            color={totalBalance >= 0 ? 'success' : 'danger'}
+            size="lg"
+          />
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="glass-effect card-hover border-none shadow-lg">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Total Income</CardTitle>
-          <TrendingUp className="h-4 w-4 text-green-600" />
+          <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Income</CardTitle>
+          <TrendingUp className="h-5 w-5 text-green-600 dark:text-green-400" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold text-green-600">
-            {formatCurrency(totalIncome)}
-          </div>
+          <DualCurrencyDisplay 
+            usdAmount={totalIncome} 
+            color="success"
+            size="lg"
+          />
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="glass-effect card-hover border-none shadow-lg">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Total Expenses</CardTitle>
-          <TrendingDown className="h-4 w-4 text-red-600" />
+          <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Expenses</CardTitle>
+          <TrendingDown className="h-5 w-5 text-red-600 dark:text-red-400" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold text-red-600">
-            {formatCurrency(totalExpenses)}
-          </div>
+          <DualCurrencyDisplay 
+            usdAmount={totalExpenses} 
+            color="danger"
+            size="lg"
+          />
         </CardContent>
       </Card>
     </div>

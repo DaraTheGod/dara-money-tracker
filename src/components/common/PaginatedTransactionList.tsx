@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import { MoreHorizontal, Edit, Trash2, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -22,7 +22,7 @@ interface PaginatedTransactionListProps {
 }
 
 const PaginatedTransactionList = ({ type, showBadges = false }: PaginatedTransactionListProps) => {
-  const { data: paginatedData } = usePaginatedTransactions(type, 5);
+  const { data: paginatedData, refetch } = usePaginatedTransactions(type, 5);
   const [allTransactions, setAllTransactions] = useState(paginatedData?.data || []);
   const [editingTransaction, setEditingTransaction] = useState(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -30,11 +30,24 @@ const PaginatedTransactionList = ({ type, showBadges = false }: PaginatedTransac
   const loadMoreQuery = useLoadMoreTransactions(type, allTransactions);
   const deleteTransaction = useDeleteTransaction();
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (paginatedData?.data) {
       setAllTransactions(paginatedData.data);
     }
   }, [paginatedData?.data]);
+
+  // Auto-refresh functionality
+  useEffect(() => {
+    const handleStorageChange = () => {
+      refetch();
+    };
+
+    window.addEventListener('transactionAdded', handleStorageChange);
+    
+    return () => {
+      window.removeEventListener('transactionAdded', handleStorageChange);
+    };
+  }, [refetch]);
 
   const loadMore = async () => {
     const moreData = await loadMoreQuery.refetch();
@@ -68,21 +81,46 @@ const PaginatedTransactionList = ({ type, showBadges = false }: PaginatedTransac
     <>
       <div className="space-y-3">
         {allTransactions.map((transaction) => (
-          <div key={transaction.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+          <div key={transaction.id} className="flex items-center justify-between p-4 glass-effect rounded-lg card-hover">
             <div className="flex-1">
               <div className="flex items-center justify-between">
                 <p className="font-medium text-gray-900 dark:text-white">
                   {transaction.description || 'No description'}
                 </p>
-                {showBadges ? (
-                  <Badge variant={transaction.type === 'income' ? 'default' : 'destructive'}>
-                    {transaction.type === 'income' ? '+' : '-'}{formatCurrency(Number(transaction.amount), 'USD')}
-                  </Badge>
-                ) : (
-                  <span className={`font-bold ${transaction.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
-                    {formatCurrency(Number(transaction.amount), 'USD')}
-                  </span>
-                )}
+                <div className="flex items-center space-x-2">
+                  {showBadges ? (
+                    <Badge 
+                      variant={transaction.type === 'income' ? 'default' : 'destructive'}
+                      className="bg-opacity-20"
+                    >
+                      {transaction.type === 'income' ? '+' : '-'}{formatCurrency(Number(transaction.amount), 'USD')}
+                    </Badge>
+                  ) : (
+                    <span className={`font-bold ${transaction.type === 'income' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                      {formatCurrency(Number(transaction.amount), 'USD')}
+                    </span>
+                  )}
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="glass-effect border-none">
+                      <DropdownMenuItem onClick={() => setEditingTransaction(transaction)}>
+                        <Edit className="h-4 w-4 mr-2" />
+                        Edit
+                      </DropdownMenuItem>
+                      <DropdownMenuItem 
+                        onClick={() => setDeletingId(transaction.id)}
+                        className="text-red-600 dark:text-red-400"
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Delete
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
               </div>
               <div className="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400 mt-1">
                 <span>{transaction.categories?.name || 'Uncategorized'}</span>
@@ -90,26 +128,6 @@ const PaginatedTransactionList = ({ type, showBadges = false }: PaginatedTransac
                 <span>{formatDate(transaction.transaction_date)}</span>
               </div>
             </div>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm">
-                  <MoreHorizontal className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => setEditingTransaction(transaction)}>
-                  <Edit className="h-4 w-4 mr-2" />
-                  Edit
-                </DropdownMenuItem>
-                <DropdownMenuItem 
-                  onClick={() => setDeletingId(transaction.id)}
-                  className="text-red-600"
-                >
-                  <Trash2 className="h-4 w-4 mr-2" />
-                  Delete
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
           </div>
         ))}
         
@@ -118,7 +136,7 @@ const PaginatedTransactionList = ({ type, showBadges = false }: PaginatedTransac
             variant="outline"
             onClick={loadMore}
             disabled={loadMoreQuery.isFetching}
-            className="w-full"
+            className="w-full glass-effect border-none hover:bg-gray-100 dark:hover:bg-gray-800"
           >
             <ChevronDown className="h-4 w-4 mr-2" />
             {loadMoreQuery.isFetching ? 'Loading...' : 'Load More'}
