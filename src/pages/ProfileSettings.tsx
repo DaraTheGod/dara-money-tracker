@@ -157,7 +157,7 @@ const ProfileSettings = () => {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <Card className="glass-effect border-none shadow-lg">
+        <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 shadow-lg">
           <CardHeader>
             <CardTitle>Personal Information</CardTitle>
           </CardHeader>
@@ -168,7 +168,7 @@ const ProfileSettings = () => {
                 id="email" 
                 value={user?.email || ''} 
                 disabled 
-                className="glass-effect border-none"
+                className="bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600"
               />
             </div>
             <div className="space-y-2">
@@ -177,23 +177,32 @@ const ProfileSettings = () => {
                 id="username"
                 value={profile.username}
                 onChange={(e) => setProfile({ ...profile, username: e.target.value })}
-                className="glass-effect border-none"
+                className="bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600"
               />
             </div>
             <div className="space-y-2">
               <Label>Profile Image</Label>
-              <FileUpload
-                onFileSelect={handleFileSelect}
-                onFileRemove={handleFileRemove}
-                currentFile={profile.profile_image}
-                accept="image/*"
-                maxSize={5}
-              />
+              <div className="w-full">
+                <FileUpload
+                  onFileSelect={handleFileSelect}
+                  onFileRemove={handleFileRemove}
+                  currentFile={profile.profile_image}
+                  accept="image/*"
+                  maxSize={5}
+                />
+                {profile.profile_image && profile.username && (
+                  <div className="mt-4 text-center">
+                    <p className="text-sm font-medium text-gray-900 dark:text-white">
+                      {profile.username}
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="glass-effect border-none shadow-lg">
+        <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 shadow-lg">
           <CardHeader>
             <CardTitle>Preferences</CardTitle>
           </CardHeader>
@@ -216,10 +225,10 @@ const ProfileSettings = () => {
                 value={profile.preferred_currency} 
                 onValueChange={(value) => setProfile({ ...profile, preferred_currency: value })}
               >
-                <SelectTrigger className="glass-effect border-none">
+                <SelectTrigger className="bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="glass-effect border-none">
+                <SelectContent className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
                   <SelectItem value="USD">USD - US Dollar</SelectItem>
                   <SelectItem value="KHR">KHR - Cambodian Riel</SelectItem>
                 </SelectContent>

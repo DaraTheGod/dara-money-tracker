@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { format } from 'date-fns';
-import { MoreHorizontal, Edit, Trash2, ChevronDown } from 'lucide-react';
+import { MoreHorizontal, Edit, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -10,8 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { usePaginatedTransactions, useLoadMoreTransactions } from '@/hooks/usePaginatedTransactions';
-import { useDeleteTransaction } from '@/hooks/useTransactions';
+import { useTransactions, useDeleteTransaction } from '@/hooks/useTransactions';
 import { formatCurrency } from '@/utils/currency';
 import TransactionModal from '@/components/modals/TransactionModal';
 import DeleteConfirmModal from '@/components/modals/DeleteConfirmModal';
@@ -22,19 +21,11 @@ interface PaginatedTransactionListProps {
 }
 
 const PaginatedTransactionList = ({ type, showBadges = false }: PaginatedTransactionListProps) => {
-  const { data: paginatedData, refetch } = usePaginatedTransactions(type, 5);
-  const [allTransactions, setAllTransactions] = useState(paginatedData?.data || []);
+  const { data: allTransactions = [], refetch } = useTransactions(type);
   const [editingTransaction, setEditingTransaction] = useState(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   
-  const loadMoreQuery = useLoadMoreTransactions(type, allTransactions);
   const deleteTransaction = useDeleteTransaction();
-
-  useEffect(() => {
-    if (paginatedData?.data) {
-      setAllTransactions(paginatedData.data);
-    }
-  }, [paginatedData?.data]);
 
   // Auto-refresh functionality
   useEffect(() => {
@@ -49,18 +40,10 @@ const PaginatedTransactionList = ({ type, showBadges = false }: PaginatedTransac
     };
   }, [refetch]);
 
-  const loadMore = async () => {
-    const moreData = await loadMoreQuery.refetch();
-    if (moreData.data) {
-      setAllTransactions(prev => [...prev, ...moreData.data]);
-    }
-  };
-
   const handleDelete = async () => {
     if (deletingId) {
       await deleteTransaction.mutateAsync(deletingId);
       setDeletingId(null);
-      setAllTransactions(prev => prev.filter(t => t.id !== deletingId));
     }
   };
 
@@ -68,7 +51,7 @@ const PaginatedTransactionList = ({ type, showBadges = false }: PaginatedTransac
     return format(new Date(dateString), 'MMM d, yyyy');
   };
 
-  if (!paginatedData?.data?.length) {
+  if (!allTransactions?.length) {
     return (
       <div className="text-center py-8 text-gray-500 dark:text-gray-400">
         <p>No transactions found</p>
@@ -77,11 +60,14 @@ const PaginatedTransactionList = ({ type, showBadges = false }: PaginatedTransac
     );
   }
 
+  // Show only first 5 transactions for the list view
+  const displayTransactions = type ? allTransactions.slice(0, 5) : allTransactions;
+
   return (
     <>
-      <div className="space-y-3">
-        {allTransactions.map((transaction) => (
-          <div key={transaction.id} className="flex items-center justify-between p-4 glass-effect rounded-lg card-hover">
+      <div className="space-y-3 max-h-80 overflow-y-auto">
+        {displayTransactions.map((transaction) => (
+          <div key={transaction.id} className="flex items-center justify-between p-4 bg-white/60 dark:bg-gray-800/60 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-white/80 dark:hover:bg-gray-800/80 transition-all duration-200">
             <div className="flex-1">
               <div className="flex items-center justify-between">
                 <p className="font-medium text-gray-900 dark:text-white">
@@ -93,11 +79,11 @@ const PaginatedTransactionList = ({ type, showBadges = false }: PaginatedTransac
                       variant={transaction.type === 'income' ? 'default' : 'destructive'}
                       className="bg-opacity-20"
                     >
-                      {transaction.type === 'income' ? '+' : '-'}{formatCurrency(Number(transaction.amount), 'USD')}
+                      {transaction.type === 'income' ? '+' : '-'}{formatCurrency(Number(transaction.amount), transaction.currency as 'USD' | 'KHR')}
                     </Badge>
                   ) : (
                     <span className={`font-bold ${transaction.type === 'income' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-                      {formatCurrency(Number(transaction.amount), 'USD')}
+                      {formatCurrency(Number(transaction.amount), transaction.currency as 'USD' | 'KHR')}
                     </span>
                   )}
                   <DropdownMenu>
@@ -106,7 +92,7 @@ const PaginatedTransactionList = ({ type, showBadges = false }: PaginatedTransac
                         <MoreHorizontal className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="glass-effect border-none">
+                    <DropdownMenuContent align="end" className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
                       <DropdownMenuItem onClick={() => setEditingTransaction(transaction)}>
                         <Edit className="h-4 w-4 mr-2" />
                         Edit
@@ -130,18 +116,6 @@ const PaginatedTransactionList = ({ type, showBadges = false }: PaginatedTransac
             </div>
           </div>
         ))}
-        
-        {paginatedData?.hasMore && allTransactions.length < (paginatedData?.total || 0) && (
-          <Button
-            variant="outline"
-            onClick={loadMore}
-            disabled={loadMoreQuery.isFetching}
-            className="w-full glass-effect border-none hover:bg-gray-100 dark:hover:bg-gray-800"
-          >
-            <ChevronDown className="h-4 w-4 mr-2" />
-            {loadMoreQuery.isFetching ? 'Loading...' : 'Load More'}
-          </Button>
-        )}
       </div>
 
       <TransactionModal

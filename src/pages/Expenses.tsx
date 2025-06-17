@@ -8,7 +8,7 @@ import ExpenseList from '@/components/expenses/ExpenseList';
 import ExpenseChart from '@/components/expenses/ExpenseChart';
 import TransactionModal from '@/components/modals/TransactionModal';
 import FilterDropdown from '@/components/common/FilterDropdown';
-import DualCurrencyDisplay from '@/components/common/DualCurrencyDisplay';
+import { formatCurrency } from '@/utils/currency';
 
 const Expenses = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -16,7 +16,13 @@ const Expenses = () => {
   const [chartType, setChartType] = useState<'bar' | 'line'>('bar');
   const { data: expenses = [] } = useTransactions('expense');
 
-  const totalExpenses = expenses.reduce((sum, expense) => sum + Number(expense.amount), 0);
+  const totalExpenseUSD = expenses
+    .filter(t => t.currency === 'USD')
+    .reduce((sum, expense) => sum + Number(expense.amount), 0);
+
+  const totalExpenseKHR = expenses
+    .filter(t => t.currency === 'KHR')
+    .reduce((sum, expense) => sum + Number(expense.amount), 0);
 
   return (
     <div className="space-y-6">
@@ -34,21 +40,26 @@ const Expenses = () => {
         </Button>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2 xl:grid-cols-5">
-        <Card className="lg:col-span-1 xl:col-span-2 glass-effect border-none shadow-lg">
+      <div className="grid gap-6 lg:grid-cols-3">
+        <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 shadow-lg">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">Recent Expenses</CardTitle>
             <TrendingDown className="h-5 w-5 text-red-600 dark:text-red-400" />
           </CardHeader>
           <CardContent>
-            <div className="mb-4">
-              <DualCurrencyDisplay usdAmount={totalExpenses} color="danger" size="lg" />
+            <div className="mb-4 space-y-1">
+              <div className="text-2xl font-bold text-red-600 dark:text-red-400">
+                {formatCurrency(totalExpenseUSD, 'USD')}
+              </div>
+              <div className="text-sm text-red-600 dark:text-red-400">
+                {formatCurrency(totalExpenseKHR, 'KHR')}
+              </div>
             </div>
             <ExpenseList />
           </CardContent>
         </Card>
 
-        <Card className="lg:col-span-1 xl:col-span-3 glass-effect border-none shadow-lg">
+        <Card className="lg:col-span-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 shadow-lg">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">Expense Trends</CardTitle>
             <div className="flex items-center space-x-2">
@@ -71,8 +82,10 @@ const Expenses = () => {
               <FilterDropdown value={dateRange} onChange={setDateRange} />
             </div>
           </CardHeader>
-          <CardContent>
-            <ExpenseChart type={chartType} dateRange={dateRange} />
+          <CardContent className="pt-2">
+            <div className="h-80">
+              <ExpenseChart type={chartType} dateRange={dateRange} />
+            </div>
           </CardContent>
         </Card>
       </div>

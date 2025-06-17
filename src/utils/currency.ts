@@ -42,20 +42,33 @@ export const checkSufficientBalance = (
   transactionAmount: number, 
   currency: 'USD' | 'KHR'
 ): { sufficient: boolean; message?: string } => {
-  let balanceInTransactionCurrency: number;
-  
-  if (currency === 'USD') {
-    balanceInTransactionCurrency = currentBalance;
-  } else {
-    balanceInTransactionCurrency = convertCurrency(currentBalance, 'USD', 'KHR');
-  }
-  
-  if (transactionAmount > balanceInTransactionCurrency) {
+  if (transactionAmount > currentBalance) {
     return {
       sufficient: false,
-      message: `Insufficient balance. Available: ${formatCurrency(balanceInTransactionCurrency, currency)}`
+      message: `Insufficient balance. Available: ${formatCurrency(currentBalance, currency)}`
     };
   }
   
   return { sufficient: true };
+};
+
+// New function to calculate dual currency balances
+export const calculateDualCurrencyBalances = (transactions: any[]) => {
+  const balanceUSD = transactions
+    .filter(t => t.currency === 'USD')
+    .reduce((balance, t) => {
+      return t.type === 'income' ? balance + Number(t.amount) : balance - Number(t.amount);
+    }, 0);
+
+  const balanceKHR = transactions
+    .filter(t => t.currency === 'KHR')
+    .reduce((balance, t) => {
+      return t.type === 'income' ? balance + Number(t.amount) : balance - Number(t.amount);
+    }, 0);
+
+  return { balanceUSD, balanceKHR };
+};
+
+export const formatDualCurrencyBalance = (balanceUSD: number, balanceKHR: number): string => {
+  return `${formatCurrency(balanceUSD, 'USD')}\n${formatCurrency(balanceKHR, 'KHR')}`;
 };
