@@ -104,7 +104,7 @@ const TransactionModal = ({ isOpen, onClose, transaction, defaultType }: Transac
         if (!isNaN(amount) && amount > 0) {
           const currentBalance = value.currency === 'USD' ? balanceUSD : balanceKHR;
           if (amount > currentBalance) {
-            setBalanceWarning(`Insufficient balance. Available: ${amount.toLocaleString()} ${value.currency}`);
+            setBalanceWarning(`Insufficient balance. Available: ${currentBalance.toLocaleString()} ${value.currency}`);
           } else {
             setBalanceWarning('');
           }
@@ -173,18 +173,18 @@ const TransactionModal = ({ isOpen, onClose, transaction, defaultType }: Transac
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] overflow-auto bg-black/60 flex items-center justify-center backdrop-blur-sm">
-      <div className="relative bg-white dark:bg-gray-900 rounded-2xl shadow-2xl max-w-md w-full mx-4 border border-gray-200 dark:border-gray-700">
+    <div className="fixed inset-0 z-[9999] overflow-auto bg-black/80 flex items-center justify-center backdrop-blur-sm">
+      <div className="relative bg-gray-800 dark:bg-gray-900 rounded-2xl shadow-2xl max-w-md w-full mx-4 border border-gray-700 dark:border-gray-600">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+        <div className="flex items-center justify-between p-6 border-b border-gray-700 dark:border-gray-600">
+          <h2 className="text-xl font-semibold text-white">
             {transaction ? 'Edit Transaction' : 'Add Transaction'}
           </h2>
           <Button
             variant="ghost"
             size="sm"
             onClick={handleClose}
-            className="h-8 w-8 p-0 hover:bg-gray-100 dark:hover:bg-gray-800"
+            className="h-8 w-8 p-0 hover:bg-gray-700 dark:hover:bg-gray-800 text-gray-300 hover:text-white"
           >
             <X className="h-4 w-4" />
           </Button>
@@ -193,9 +193,9 @@ const TransactionModal = ({ isOpen, onClose, transaction, defaultType }: Transac
         {/* Content */}
         <div className="p-6">
           {balanceWarning && (
-            <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg flex items-center space-x-2">
-              <AlertTriangle className="h-4 w-4 text-red-600 dark:text-red-400" />
-              <span className="text-sm text-red-700 dark:text-red-300">{balanceWarning}</span>
+            <div className="mb-4 p-3 bg-red-900/20 border border-red-800 rounded-lg flex items-center space-x-2">
+              <AlertTriangle className="h-4 w-4 text-red-400" />
+              <span className="text-sm text-red-300">{balanceWarning}</span>
             </div>
           )}
 
@@ -206,16 +206,16 @@ const TransactionModal = ({ isOpen, onClose, transaction, defaultType }: Transac
                 name="type"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-gray-700 dark:text-gray-300">Type</FormLabel>
+                    <FormLabel className="text-gray-300">Type</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
-                        <SelectTrigger className="bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100">
+                        <SelectTrigger className="bg-gray-700 border-gray-600 text-white">
                           <SelectValue placeholder="Select a type" />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 z-[110]">
-                        <SelectItem value="income" className="text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700">Income</SelectItem>
-                        <SelectItem value="expense" className="text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700">Expense</SelectItem>
+                      <SelectContent className="bg-gray-800 border-gray-600 z-[10000]">
+                        <SelectItem value="income" className="text-white hover:bg-gray-700">Income</SelectItem>
+                        <SelectItem value="expense" className="text-white hover:bg-gray-700">Expense</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -229,12 +229,12 @@ const TransactionModal = ({ isOpen, onClose, transaction, defaultType }: Transac
                   name="amount"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-gray-700 dark:text-gray-300">Amount</FormLabel>
+                      <FormLabel className="text-gray-300">Amount</FormLabel>
                       <FormControl>
                         <Input 
                           placeholder="0.00" 
                           {...field} 
-                          className="bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400" 
+                          className="bg-gray-700 border-gray-600 text-white placeholder:text-gray-400" 
                         />
                       </FormControl>
                       <FormMessage />
@@ -247,16 +247,16 @@ const TransactionModal = ({ isOpen, onClose, transaction, defaultType }: Transac
                   name="currency"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-gray-700 dark:text-gray-300">Currency</FormLabel>
+                      <FormLabel className="text-gray-300">Currency</FormLabel>
                       <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
-                          <SelectTrigger className="bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100">
+                          <SelectTrigger className="bg-gray-700 border-gray-600 text-white">
                             <SelectValue placeholder="Currency" />
                           </SelectTrigger>
                         </FormControl>
-                        <SelectContent className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 z-[110]">
-                          <SelectItem value="USD" className="text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700">USD</SelectItem>
-                          <SelectItem value="KHR" className="text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700">KHR</SelectItem>
+                        <SelectContent className="bg-gray-800 border-gray-600 z-[10000]">
+                          <SelectItem value="USD" className="text-white hover:bg-gray-700">USD</SelectItem>
+                          <SelectItem value="KHR" className="text-white hover:bg-gray-700">KHR</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -270,19 +270,19 @@ const TransactionModal = ({ isOpen, onClose, transaction, defaultType }: Transac
                 name="category_id"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-gray-700 dark:text-gray-300">Category</FormLabel>
+                    <FormLabel className="text-gray-300">Category</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value} disabled={isLoadingCategories}>
                       <FormControl>
-                        <SelectTrigger className="bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100">
+                        <SelectTrigger className="bg-gray-700 border-gray-600 text-white">
                           <SelectValue placeholder="Select a category" />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 z-[110]">
+                      <SelectContent className="bg-gray-800 border-gray-600 z-[10000]">
                         {categories?.map(category => (
                           <SelectItem 
                             key={category.id} 
                             value={category.id}
-                            className="text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700"
+                            className="text-white hover:bg-gray-700"
                           >
                             {category.name}
                           </SelectItem>
@@ -299,11 +299,11 @@ const TransactionModal = ({ isOpen, onClose, transaction, defaultType }: Transac
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-gray-700 dark:text-gray-300">Description</FormLabel>
+                    <FormLabel className="text-gray-300">Description</FormLabel>
                     <FormControl>
                       <Textarea
                         placeholder="Description"
-                        className="resize-none bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400"
+                        className="resize-none bg-gray-700 border-gray-600 text-white placeholder:text-gray-400"
                         {...field}
                       />
                     </FormControl>
@@ -317,14 +317,14 @@ const TransactionModal = ({ isOpen, onClose, transaction, defaultType }: Transac
                 name="transaction_date"
                 render={({ field }) => (
                   <FormItem className="flex flex-col">
-                    <FormLabel className="text-gray-700 dark:text-gray-300">Transaction Date</FormLabel>
+                    <FormLabel className="text-gray-300">Transaction Date</FormLabel>
                     <Popover>
                       <PopoverTrigger asChild>
                         <FormControl>
                           <Button
                             variant={"outline"}
                             className={cn(
-                              "w-full pl-3 text-left font-normal bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100",
+                              "w-full pl-3 text-left font-normal bg-gray-700 border-gray-600 text-white",
                               !field.value && "text-muted-foreground"
                             )}
                           >
@@ -337,14 +337,14 @@ const TransactionModal = ({ isOpen, onClose, transaction, defaultType }: Transac
                           </Button>
                         </FormControl>
                       </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 z-[110]" align="start">
+                      <PopoverContent className="w-auto p-0 bg-gray-800 border-gray-600 z-[10000]" align="start">
                         <Calendar
                           mode="single"
                           selected={field.value}
                           onSelect={field.onChange}
                           disabled={(date) => date > new Date()}
                           initialFocus
-                          className="text-gray-900 dark:text-gray-100"
+                          className="text-white"
                         />
                       </PopoverContent>
                     </Popover>
@@ -358,7 +358,7 @@ const TransactionModal = ({ isOpen, onClose, transaction, defaultType }: Transac
                   variant="outline"
                   onClick={handleClose}
                   disabled={isSubmitting}
-                  className="hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-200 dark:border-gray-700"
+                  className="hover:bg-gray-700 text-gray-300 border-gray-600 hover:text-white"
                 >
                   Cancel
                 </Button>

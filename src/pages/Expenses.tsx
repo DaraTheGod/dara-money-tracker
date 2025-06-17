@@ -41,17 +41,17 @@ const Expenses = () => {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
-        <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 shadow-lg">
+        <Card className="bg-gray-800/80 border border-gray-700 shadow-lg">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">Recent Expenses</CardTitle>
-            <TrendingDown className="h-5 w-5 text-red-600 dark:text-red-400" />
+            <CardTitle className="text-lg font-semibold text-white">Recent Expenses</CardTitle>
+            <TrendingDown className="h-5 w-5 text-red-400" />
           </CardHeader>
           <CardContent>
             <div className="mb-4 space-y-1">
-              <div className="text-2xl font-bold text-red-600 dark:text-red-400">
+              <div className="text-2xl font-bold text-red-400">
                 {formatCurrency(totalExpenseUSD, 'USD')}
               </div>
-              <div className="text-sm text-red-600 dark:text-red-400">
+              <div className="text-sm text-red-400">
                 {formatCurrency(totalExpenseKHR, 'KHR')}
               </div>
             </div>
@@ -59,9 +59,9 @@ const Expenses = () => {
           </CardContent>
         </Card>
 
-        <Card className="lg:col-span-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 shadow-lg">
+        <Card className="lg:col-span-2 bg-gray-800/80 border border-gray-700 shadow-lg">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">Expense Trends</CardTitle>
+            <CardTitle className="text-lg font-semibold text-white">Expense Trends</CardTitle>
             <div className="flex items-center space-x-2">
               <Button
                 variant={chartType === 'bar' ? 'default' : 'outline'}
@@ -83,7 +83,7 @@ const Expenses = () => {
             </div>
           </CardHeader>
           <CardContent className="pt-2">
-            <div className="h-80">
+            <div className="h-64">
               <ExpenseChart type={chartType} dateRange={dateRange} />
             </div>
           </CardContent>

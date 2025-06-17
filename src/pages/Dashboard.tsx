@@ -16,8 +16,8 @@ const Dashboard = () => {
       
       <div className="grid gap-6 lg:grid-cols-2">
         <RecentTransactions />
-        <div className="glass-effect p-6 rounded-xl shadow-lg border-none">
-          <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Financial Overview</h3>
+        <div className="bg-gray-800/80 p-6 rounded-xl shadow-lg border border-gray-700">
+          <h3 className="text-lg font-semibold mb-4 text-white">Financial Overview</h3>
           <FinancialChart />
         </div>
       </div>

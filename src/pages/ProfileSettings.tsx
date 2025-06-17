@@ -4,24 +4,22 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAuth } from '@/contexts/AuthContext';
-import { useTheme } from '@/contexts/ThemeContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import FileUpload from '@/components/ui/file-upload';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Camera, User, Mail, Save } from 'lucide-react';
+import { FileUpload } from '@/components/ui/file-upload';
 
 const ProfileSettings = () => {
-  const { user, signOut } = useAuth();
-  const { isDark, toggleTheme } = useTheme();
+  const { user } = useAuth();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
-  const [profile, setProfile] = useState({
+  const [profileData, setProfileData] = useState({
     username: '',
-    preferred_currency: 'USD',
-    dark_mode: false,
-    profile_image: '',
+    first_name: '',
+    last_name: '',
+    avatar_url: ''
   });
 
   useEffect(() => {
@@ -38,55 +36,74 @@ const ProfileSettings = () => {
         .eq('id', user?.id)
         .single();
 
-      if (error) throw error;
+      if (error && error.code !== 'PGRST116') {
+        throw error;
+      }
 
       if (data) {
-        setProfile({
+        setProfileData({
           username: data.username || '',
-          preferred_currency: data.preferred_currency || 'USD',
-          dark_mode: data.dark_mode || false,
-          profile_image: data.profile_image || '',
+          first_name: data.first_name || '',
+          last_name: data.last_name || '',
+          avatar_url: data.avatar_url || ''
         });
       }
     } catch (error) {
       console.error('Error fetching profile:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load profile data",
+        variant: "destructive",
+      });
     }
   };
 
-  const handleFileSelect = async (file: File) => {
+  const handleInputChange = (field: string, value: string) => {
+    setProfileData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const handleFileUpload = async (files: File[]) => {
+    if (!files[0] || !user) return;
+
+    const file = files[0];
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${user.id}.${fileExt}`;
+
     try {
       setLoading(true);
-      
-      // Create a unique filename
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${user?.id}/${Date.now()}.${fileExt}`;
-      
-      // Upload to Supabase Storage
-      const { data, error } = await supabase.storage
-        .from('avatars')
-        .upload(fileName, file, {
-          cacheControl: '3600',
-          upsert: false
-        });
 
-      if (error) throw error;
+      // Upload file to Supabase Storage
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(fileName, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
 
       // Get public URL
       const { data: urlData } = supabase.storage
         .from('avatars')
         .getPublicUrl(fileName);
 
-      setProfile(prev => ({ ...prev, profile_image: urlData.publicUrl }));
-      
+      const avatarUrl = urlData.publicUrl;
+
+      // Update profile with new avatar URL
+      setProfileData(prev => ({
+        ...prev,
+        avatar_url: avatarUrl
+      }));
+
       toast({
         title: "Success",
-        description: "Profile image uploaded successfully.",
+        description: "Profile image uploaded successfully",
       });
     } catch (error) {
       console.error('Error uploading file:', error);
       toast({
         title: "Error",
-        description: "Failed to upload profile image.",
+        description: "Failed to upload profile image",
         variant: "destructive",
       });
     } finally {
@@ -94,50 +111,36 @@ const ProfileSettings = () => {
     }
   };
 
-  const handleFileRemove = async () => {
-    if (profile.profile_image) {
-      try {
-        // Extract filename from URL
-        const url = new URL(profile.profile_image);
-        const fileName = url.pathname.split('/').pop();
-        
-        if (fileName) {
-          await supabase.storage
-            .from('avatars')
-            .remove([`${user?.id}/${fileName}`]);
-        }
-      } catch (error) {
-        console.error('Error removing file:', error);
-      }
-    }
-    
-    setProfile(prev => ({ ...prev, profile_image: '' }));
-  };
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user) return;
 
-  const updateProfile = async () => {
-    setLoading(true);
     try {
+      setLoading(true);
+
       const { error } = await supabase
         .from('profiles')
-        .update({
-          username: profile.username,
-          preferred_currency: profile.preferred_currency,
-          dark_mode: profile.dark_mode,
-          profile_image: profile.profile_image,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', user?.id);
+        .upsert([
+          {
+            id: user.id,
+            username: profileData.username,
+            first_name: profileData.first_name,
+            last_name: profileData.last_name,
+            avatar_url: profileData.avatar_url,
+          }
+        ]);
 
       if (error) throw error;
 
       toast({
         title: "Success",
-        description: "Profile updated successfully.",
+        description: "Profile updated successfully",
       });
     } catch (error) {
+      console.error('Error updating profile:', error);
       toast({
         title: "Error",
-        description: "Failed to update profile.",
+        description: "Failed to update profile",
         variant: "destructive",
       });
     } finally {
@@ -145,111 +148,122 @@ const ProfileSettings = () => {
     }
   };
 
-  const handleSignOut = async () => {
-    await signOut();
-  };
-
   return (
-    <div className="space-y-6">
+    <div className="max-w-2xl mx-auto space-y-6">
       <div>
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Profile Settings</h1>
-        <p className="text-gray-600 dark:text-gray-300">Manage your account settings and preferences.</p>
+        <p className="text-gray-600 dark:text-gray-400">Manage your account information</p>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 shadow-lg">
-          <CardHeader>
-            <CardTitle>Personal Information</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input 
-                id="email" 
-                value={user?.email || ''} 
-                disabled 
-                className="bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600"
-              />
+      <Card className="bg-gray-800/80 border border-gray-700 shadow-lg">
+        <CardHeader>
+          <CardTitle className="text-white flex items-center gap-2">
+            <User className="h-5 w-5" />
+            Profile Information
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* Profile Image Section */}
+          <div className="flex flex-col sm:flex-row items-center gap-6">
+            <div className="flex flex-col items-center space-y-3">
+              <Avatar className="h-24 w-24 sm:h-32 sm:w-32">
+                <AvatarImage 
+                  src={profileData.avatar_url} 
+                  alt="Profile" 
+                  className="object-cover"
+                />
+                <AvatarFallback className="bg-gray-700 text-white text-lg sm:text-xl">
+                  {profileData.username ? profileData.username.charAt(0).toUpperCase() : 'U'}
+                </AvatarFallback>
+              </Avatar>
+              {profileData.username && (
+                <div className="text-center">
+                  <p className="text-white font-medium text-sm sm:text-base">{profileData.username}</p>
+                  <p className="text-gray-400 text-xs sm:text-sm">{user?.email}</p>
+                </div>
+              )}
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="username">Username</Label>
+            
+            <div className="flex-1 w-full">
+              <Label htmlFor="avatar" className="text-gray-300 mb-2 block">
+                Profile Image
+              </Label>
+              <FileUpload 
+                onChange={handleFileUpload}
+                className="w-full"
+                multiple={false}
+              />
+              <p className="text-xs text-gray-400 mt-1">
+                Upload a profile image (JPG, PNG, etc.)
+              </p>
+            </div>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="first_name" className="text-gray-300">First Name</Label>
+                <Input
+                  id="first_name"
+                  value={profileData.first_name}
+                  onChange={(e) => handleInputChange('first_name', e.target.value)}
+                  className="bg-gray-700 border-gray-600 text-white"
+                />
+              </div>
+              <div>
+                <Label htmlFor="last_name" className="text-gray-300">Last Name</Label>
+                <Input
+                  id="last_name"
+                  value={profileData.last_name}
+                  onChange={(e) => handleInputChange('last_name', e.target.value)}
+                  className="bg-gray-700 border-gray-600 text-white"
+                />
+              </div>
+            </div>
+
+            <div>
+              <Label htmlFor="username" className="text-gray-300">Username</Label>
               <Input
                 id="username"
-                value={profile.username}
-                onChange={(e) => setProfile({ ...profile, username: e.target.value })}
-                className="bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600"
+                value={profileData.username}
+                onChange={(e) => handleInputChange('username', e.target.value)}
+                className="bg-gray-700 border-gray-600 text-white"
               />
             </div>
-            <div className="space-y-2">
-              <Label>Profile Image</Label>
-              <div className="w-full">
-                <FileUpload
-                  onFileSelect={handleFileSelect}
-                  onFileRemove={handleFileRemove}
-                  currentFile={profile.profile_image}
-                  accept="image/*"
-                  maxSize={5}
+
+            <div>
+              <Label htmlFor="email" className="text-gray-300">Email</Label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <Input
+                  id="email"
+                  value={user?.email || ''}
+                  disabled
+                  className="bg-gray-700 border-gray-600 text-gray-400 pl-10"
                 />
-                {profile.profile_image && profile.username && (
-                  <div className="mt-4 text-center">
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">
-                      {profile.username}
-                    </p>
-                  </div>
-                )}
               </div>
+              <p className="text-xs text-gray-400 mt-1">
+                Email cannot be changed from this page
+              </p>
             </div>
-          </CardContent>
-        </Card>
 
-        <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 shadow-lg">
-          <CardHeader>
-            <CardTitle>Preferences</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label>Dark Mode</Label>
-                <p className="text-sm text-muted-foreground">
-                  Toggle between light and dark theme
-                </p>
-              </div>
-              <Switch
-                checked={isDark}
-                onCheckedChange={toggleTheme}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="currency">Preferred Currency</Label>
-              <Select 
-                value={profile.preferred_currency} 
-                onValueChange={(value) => setProfile({ ...profile, preferred_currency: value })}
-              >
-                <SelectTrigger className="bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
-                  <SelectItem value="USD">USD - US Dollar</SelectItem>
-                  <SelectItem value="KHR">KHR - Cambodian Riel</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="flex justify-between">
-        <Button 
-          onClick={updateProfile} 
-          disabled={loading}
-          className="bg-blue-600 hover:bg-blue-700 text-white"
-        >
-          {loading ? 'Saving...' : 'Save Changes'}
-        </Button>
-        <Button variant="destructive" onClick={handleSignOut}>
-          Sign Out
-        </Button>
-      </div>
+            <Button 
+              type="submit" 
+              disabled={loading}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              {loading ? (
+                "Saving..."
+              ) : (
+                <>
+                  <Save className="h-4 w-4 mr-2" />
+                  Save Changes
+                </>
+              )}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   );
 };
