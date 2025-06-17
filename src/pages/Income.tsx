@@ -8,6 +8,7 @@ import IncomeList from '@/components/income/IncomeList';
 import IncomeChart from '@/components/income/IncomeChart';
 import TransactionModal from '@/components/modals/TransactionModal';
 import FilterDropdown from '@/components/common/FilterDropdown';
+import { formatCurrency } from '@/utils/currency';
 
 const Income = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -16,13 +17,6 @@ const Income = () => {
   const { data: income = [] } = useTransactions('income');
 
   const totalIncome = income.reduce((sum, inc) => sum + Number(inc.amount), 0);
-
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    }).format(amount);
-  };
 
   return (
     <div className="space-y-6">

@@ -8,6 +8,7 @@ import ExpenseList from '@/components/expenses/ExpenseList';
 import ExpenseChart from '@/components/expenses/ExpenseChart';
 import TransactionModal from '@/components/modals/TransactionModal';
 import FilterDropdown from '@/components/common/FilterDropdown';
+import { formatCurrency } from '@/utils/currency';
 
 const Expenses = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -16,13 +17,6 @@ const Expenses = () => {
   const { data: expenses = [] } = useTransactions('expense');
 
   const totalExpenses = expenses.reduce((sum, expense) => sum + Number(expense.amount), 0);
-
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    }).format(amount);
-  };
 
   return (
     <div className="space-y-6">
