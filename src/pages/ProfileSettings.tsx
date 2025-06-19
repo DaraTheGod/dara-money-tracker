@@ -9,7 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Camera, User, Mail, Save } from 'lucide-react';
-import { FileUpload } from '@/components/ui/file-upload';
+import FileUpload from '@/components/ui/file-upload';
 
 const ProfileSettings = () => {
   const { user } = useAuth();
@@ -17,9 +17,7 @@ const ProfileSettings = () => {
   const [loading, setLoading] = useState(false);
   const [profileData, setProfileData] = useState({
     username: '',
-    first_name: '',
-    last_name: '',
-    avatar_url: ''
+    profile_image: ''
   });
 
   useEffect(() => {
@@ -43,9 +41,7 @@ const ProfileSettings = () => {
       if (data) {
         setProfileData({
           username: data.username || '',
-          first_name: data.first_name || '',
-          last_name: data.last_name || '',
-          avatar_url: data.avatar_url || ''
+          profile_image: data.profile_image || ''
         });
       }
     } catch (error) {
@@ -65,10 +61,9 @@ const ProfileSettings = () => {
     }));
   };
 
-  const handleFileUpload = async (files: File[]) => {
-    if (!files[0] || !user) return;
+  const handleFileSelect = async (file: File) => {
+    if (!user) return;
 
-    const file = files[0];
     const fileExt = file.name.split('.').pop();
     const fileName = `${user.id}.${fileExt}`;
 
@@ -92,7 +87,7 @@ const ProfileSettings = () => {
       // Update profile with new avatar URL
       setProfileData(prev => ({
         ...prev,
-        avatar_url: avatarUrl
+        profile_image: avatarUrl
       }));
 
       toast({
@@ -111,6 +106,13 @@ const ProfileSettings = () => {
     }
   };
 
+  const handleFileRemove = () => {
+    setProfileData(prev => ({
+      ...prev,
+      profile_image: ''
+    }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
@@ -124,9 +126,7 @@ const ProfileSettings = () => {
           {
             id: user.id,
             username: profileData.username,
-            first_name: profileData.first_name,
-            last_name: profileData.last_name,
-            avatar_url: profileData.avatar_url,
+            profile_image: profileData.profile_image,
           }
         ]);
 
@@ -149,7 +149,7 @@ const ProfileSettings = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
+    <div className="max-w-2xl mx-auto space-y-6 p-4">
       <div>
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Profile Settings</h1>
         <p className="text-gray-600 dark:text-gray-400">Manage your account information</p>
@@ -164,34 +164,35 @@ const ProfileSettings = () => {
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Profile Image Section */}
-          <div className="flex flex-col sm:flex-row items-center gap-6">
-            <div className="flex flex-col items-center space-y-3">
-              <Avatar className="h-24 w-24 sm:h-32 sm:w-32">
-                <AvatarImage 
-                  src={profileData.avatar_url} 
-                  alt="Profile" 
-                  className="object-cover"
-                />
-                <AvatarFallback className="bg-gray-700 text-white text-lg sm:text-xl">
-                  {profileData.username ? profileData.username.charAt(0).toUpperCase() : 'U'}
-                </AvatarFallback>
-              </Avatar>
-              {profileData.username && (
-                <div className="text-center">
-                  <p className="text-white font-medium text-sm sm:text-base">{profileData.username}</p>
-                  <p className="text-gray-400 text-xs sm:text-sm">{user?.email}</p>
-                </div>
-              )}
-            </div>
+          <div className="flex flex-col items-center space-y-4">
+            <Avatar className="h-24 w-24 sm:h-32 sm:w-32">
+              <AvatarImage 
+                src={profileData.profile_image} 
+                alt="Profile" 
+                className="object-cover"
+              />
+              <AvatarFallback className="bg-gray-700 text-white text-lg sm:text-xl">
+                {profileData.username ? profileData.username.charAt(0).toUpperCase() : 'U'}
+              </AvatarFallback>
+            </Avatar>
             
-            <div className="flex-1 w-full">
+            {profileData.username && (
+              <div className="text-center">
+                <p className="text-white font-medium text-sm sm:text-base">{profileData.username}</p>
+                <p className="text-gray-400 text-xs sm:text-sm">{user?.email}</p>
+              </div>
+            )}
+            
+            <div className="w-full max-w-md">
               <Label htmlFor="avatar" className="text-gray-300 mb-2 block">
                 Profile Image
               </Label>
               <FileUpload 
-                onChange={handleFileUpload}
-                className="w-full"
-                multiple={false}
+                onFileSelect={handleFileSelect}
+                onFileRemove={handleFileRemove}
+                currentFile={profileData.profile_image}
+                accept="image/*"
+                maxSize={5}
               />
               <p className="text-xs text-gray-400 mt-1">
                 Upload a profile image (JPG, PNG, etc.)
@@ -200,27 +201,6 @@ const ProfileSettings = () => {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="first_name" className="text-gray-300">First Name</Label>
-                <Input
-                  id="first_name"
-                  value={profileData.first_name}
-                  onChange={(e) => handleInputChange('first_name', e.target.value)}
-                  className="bg-gray-700 border-gray-600 text-white"
-                />
-              </div>
-              <div>
-                <Label htmlFor="last_name" className="text-gray-300">Last Name</Label>
-                <Input
-                  id="last_name"
-                  value={profileData.last_name}
-                  onChange={(e) => handleInputChange('last_name', e.target.value)}
-                  className="bg-gray-700 border-gray-600 text-white"
-                />
-              </div>
-            </div>
-
             <div>
               <Label htmlFor="username" className="text-gray-300">Username</Label>
               <Input
