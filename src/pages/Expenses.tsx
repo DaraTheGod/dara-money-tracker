@@ -28,8 +28,8 @@ const Expenses = () => {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Expenses</h1>
-          <p className="text-gray-600 dark:text-gray-400">Track and manage your expenses</p>
+          <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Expenses</h1>
+          <p className="text-slate-600 dark:text-slate-400">Track and manage your expenses</p>
         </div>
         <Button 
           onClick={() => setIsModalOpen(true)} 
@@ -41,17 +41,17 @@ const Expenses = () => {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
-        <Card className="bg-gray-800/80 border border-gray-700 shadow-lg">
+        <Card className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-lg">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-lg font-semibold text-white">Recent Expenses</CardTitle>
-            <TrendingDown className="h-5 w-5 text-red-400" />
+            <CardTitle className="text-lg font-semibold text-slate-900 dark:text-white">Recent Expenses</CardTitle>
+            <TrendingDown className="h-5 w-5 text-red-500 dark:text-red-400" />
           </CardHeader>
           <CardContent>
             <div className="mb-4 space-y-1">
-              <div className="text-2xl font-bold text-red-400">
+              <div className="text-2xl font-bold text-red-600 dark:text-red-400">
                 {formatCurrency(totalExpenseUSD, 'USD')}
               </div>
-              <div className="text-sm text-red-400">
+              <div className="text-sm text-red-600 dark:text-red-400">
                 {formatCurrency(totalExpenseKHR, 'KHR')}
               </div>
             </div>
@@ -59,9 +59,9 @@ const Expenses = () => {
           </CardContent>
         </Card>
 
-        <Card className="lg:col-span-2 bg-gray-800/80 border border-gray-700 shadow-lg">
+        <Card className="lg:col-span-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-lg">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-lg font-semibold text-white">Expense Trends</CardTitle>
+            <CardTitle className="text-lg font-semibold text-slate-900 dark:text-white">Expense Trends</CardTitle>
             <div className="flex items-center space-x-2">
               <Button
                 variant={chartType === 'bar' ? 'default' : 'outline'}
@@ -92,7 +92,7 @@ const Expenses = () => {
 
       <TransactionModal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={() => setIsModalOp(false)}
         defaultType="expense"
       />
     </div>

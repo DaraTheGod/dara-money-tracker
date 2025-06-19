@@ -8,16 +8,16 @@ const Dashboard = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
-        <p className="text-gray-600 dark:text-gray-400">Welcome back! Here's your financial overview.</p>
+        <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Dashboard</h1>
+        <p className="text-slate-600 dark:text-slate-400">Welcome back! Here's your financial overview.</p>
       </div>
       
       <StatsCards />
       
       <div className="grid gap-6 lg:grid-cols-2">
         <RecentTransactions />
-        <div className="bg-gray-800/80 p-6 rounded-xl shadow-lg border border-gray-700">
-          <h3 className="text-lg font-semibold mb-4 text-white">Financial Overview</h3>
+        <div className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700">
+          <h3 className="text-lg font-semibold mb-4 text-slate-900 dark:text-white">Financial Overview</h3>
           <FinancialChart />
         </div>
       </div>

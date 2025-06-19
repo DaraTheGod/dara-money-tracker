@@ -11,9 +11,9 @@ const RecentTransactions = () => {
 
   return (
     <>
-      <Card className="bg-gray-800/80 border border-gray-700 shadow-lg">
+      <Card className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-lg">
         <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="text-white">Recent Transactions</CardTitle>
+          <CardTitle className="text-slate-900 dark:text-white">Recent Transactions</CardTitle>
           <Button 
             onClick={() => setIsAddModalOpen(true)} 
             size="sm"
