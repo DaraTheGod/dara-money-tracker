@@ -26,16 +26,16 @@ const Expenses = () => {
     .reduce((sum, expense) => sum + Number(expense.amount), 0);
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Expenses</h1>
-            <p className="text-gray-600 dark:text-gray-400">Track and manage your expenses</p>
+            <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100">Expenses</h1>
+            <p className="text-slate-600 dark:text-slate-400">Track and manage your expenses</p>
           </div>
           <Button 
             onClick={() => setIsModalOpen(true)} 
-            className="w-full sm:w-auto bg-red-500 hover:bg-red-600 text-white"
+            className="w-full sm:w-auto bg-rose-500 hover:bg-rose-600 text-white"
           >
             <Plus className="h-4 w-4 mr-2" />
             Add Expense
@@ -43,17 +43,17 @@ const Expenses = () => {
         </div>
 
         <div className="grid gap-6 lg:grid-cols-3">
-          <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+          <Card className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">Recent Expenses</CardTitle>
-              <TrendingDown className="h-5 w-5 text-red-500" />
+              <CardTitle className="text-lg font-semibold text-slate-900 dark:text-slate-100">Recent Expenses</CardTitle>
+              <TrendingDown className="h-5 w-5 text-rose-500" />
             </CardHeader>
             <CardContent>
               <div className="mb-4 space-y-1">
-                <div className="text-2xl font-bold text-red-500">
+                <div className="text-2xl font-bold text-rose-500 dark:text-rose-400">
                   {formatCurrency(totalExpenseUSD, 'USD')}
                 </div>
-                <div className="text-sm text-red-500">
+                <div className="text-sm text-rose-500 dark:text-rose-400">
                   {formatCurrency(totalExpenseKHR, 'KHR')}
                 </div>
               </div>
@@ -61,9 +61,9 @@ const Expenses = () => {
             </CardContent>
           </Card>
 
-          <Card className="lg:col-span-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+          <Card className="lg:col-span-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">Expense Trends</CardTitle>
+              <CardTitle className="text-lg font-semibold text-slate-900 dark:text-slate-100">Expense Trends</CardTitle>
               <div className="flex items-center space-x-2">
                 <Button
                   variant={chartType === 'bar' ? 'default' : 'outline'}

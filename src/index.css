@@ -5,67 +5,67 @@
 
 @layer base {
   :root {
-    /* Light mode - Clean professional theme */
-    --background: 249 250 251;
-    --foreground: 17 24 39;
+    /* Light mode - Clean professional theme with neutral grays */
+    --background: 250 250 250;
+    --foreground: 15 23 42;
 
     --card: 255 255 255;
-    --card-foreground: 17 24 39;
+    --card-foreground: 15 23 42;
 
     --popover: 255 255 255;
-    --popover-foreground: 17 24 39;
+    --popover-foreground: 15 23 42;
 
-    --primary: 59 130 246;
-    --primary-foreground: 255 255 255;
+    --primary: 71 85 105;
+    --primary-foreground: 248 250 252;
 
-    --secondary: 243 244 246;
-    --secondary-foreground: 17 24 39;
+    --secondary: 241 245 249;
+    --secondary-foreground: 15 23 42;
 
-    --muted: 249 250 251;
-    --muted-foreground: 107 114 128;
+    --muted: 248 250 252;
+    --muted-foreground: 100 116 139;
 
-    --accent: 243 244 246;
-    --accent-foreground: 17 24 39;
+    --accent: 241 245 249;
+    --accent-foreground: 15 23 42;
 
-    --destructive: 220 38 38;
+    --destructive: 239 68 68;
     --destructive-foreground: 255 255 255;
 
-    --border: 229 231 235;
-    --input: 229 231 235;
-    --ring: 59 130 246;
+    --border: 226 232 240;
+    --input: 226 232 240;
+    --ring: 71 85 105;
 
     --radius: 0.5rem;
   }
 
   .dark {
-    /* Dark mode - Clean professional theme */
-    --background: 17 24 39;
-    --foreground: 249 250 251;
+    /* Dark mode - Clean professional theme with neutral grays */
+    --background: 15 23 42;
+    --foreground: 248 250 252;
 
-    --card: 31 41 55;
-    --card-foreground: 249 250 251;
+    --card: 30 41 59;
+    --card-foreground: 248 250 252;
 
-    --popover: 31 41 55;
-    --popover-foreground: 249 250 251;
+    --popover: 30 41 59;
+    --popover-foreground: 248 250 252;
 
-    --primary: 59 130 246;
-    --primary-foreground: 255 255 255;
+    --primary: 148 163 184;
+    --primary-foreground: 15 23 42;
 
-    --secondary: 55 65 81;
-    --secondary-foreground: 249 250 251;
+    --secondary: 51 65 85;
+    --secondary-foreground: 248 250 252;
 
-    --muted: 55 65 81;
-    --muted-foreground: 156 163 175;
+    --muted: 51 65 85;
+    --muted-foreground: 148 163 184;
 
-    --accent: 55 65 81;
-    --accent-foreground: 249 250 251;
+    --accent: 51 65 85;
+    --accent-foreground: 248 250 252;
 
-    --destructive: 220 38 38;
+    --destructive: 239 68 68;
     --destructive-foreground: 255 255 255;
 
-    --border: 55 65 81;
-    --input: 55 65 81;
-    --ring: 59 130 246;
+    --border: 51 65 85;
+    --input: 51 65 85;
+    --ring: 148 163 184;
   }
 }
 
@@ -80,11 +80,11 @@
 
   /* Clean professional styling */
   .glass-effect {
-    @apply bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm border border-gray-200 dark:border-gray-700;
+    @apply bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm border border-slate-200 dark:border-slate-700;
   }
 
   .card-hover {
-    @apply transition-all duration-200 hover:shadow-md dark:hover:shadow-gray-900/20;
+    @apply transition-all duration-200 hover:shadow-md;
   }
 }
 
@@ -93,22 +93,22 @@
     animation: slideInBottom 0.3s ease-out;
   }
 
-  /* Income colors - Green */
+  /* Income colors - Professional green */
   .text-income {
-    @apply text-green-600 dark:text-green-400;
+    @apply text-emerald-600 dark:text-emerald-400;
   }
 
   .bg-income {
-    @apply bg-green-600 hover:bg-green-700;
+    @apply bg-emerald-600 hover:bg-emerald-700;
   }
 
-  /* Expense colors - Red */
+  /* Expense colors - Softer red */
   .text-expense {
-    @apply text-red-600 dark:text-red-400;
+    @apply text-rose-500 dark:text-rose-400;
   }
 
   .bg-expense {
-    @apply bg-red-600 hover:bg-red-700;
+    @apply bg-rose-500 hover:bg-rose-600;
   }
 }
 

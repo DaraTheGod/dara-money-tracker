@@ -37,7 +37,7 @@ const FinancialChart = () => {
     {
       name: 'Expenses',
       value: totalExpensesUSD,
-      color: '#ef4444'
+      color: '#f43f5e'
     }
   ];
 
@@ -59,7 +59,7 @@ const FinancialChart = () => {
     if (active && payload && payload.length) {
       return (
         <div className="bg-white dark:bg-slate-800 p-3 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700">
-          <p className="font-medium text-slate-900 dark:text-white">{payload[0].name}</p>
+          <p className="font-medium text-slate-900 dark:text-slate-100">{payload[0].name}</p>
           <div className="text-slate-700 dark:text-slate-300">
             <div className="text-sm">{formatCurrency(payload[0].value, 'USD')}</div>
           </div>
@@ -75,10 +75,10 @@ const FinancialChart = () => {
       <div className="text-center p-4 bg-slate-50 dark:bg-slate-700/50 rounded-lg border border-slate-200 dark:border-slate-600">
         <h4 className="text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">Total Balance</h4>
         <div className="space-y-1">
-          <div className={`text-2xl font-bold ${balanceUSD >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+          <div className={`text-2xl font-bold ${balanceUSD >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-500 dark:text-rose-400'}`}>
             {formatCurrency(balanceUSD, 'USD')}
           </div>
-          <div className={`text-sm ${balanceKHR >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+          <div className={`text-sm ${balanceKHR >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-500 dark:text-rose-400'}`}>
             {formatCurrency(balanceKHR, 'KHR')}
           </div>
         </div>
@@ -114,15 +114,15 @@ const FinancialChart = () => {
         <div className="text-center p-3 bg-slate-50 dark:bg-slate-700/50 rounded-lg border border-slate-200 dark:border-slate-600">
           <p className="text-xs text-slate-600 dark:text-slate-400 mb-1">Income</p>
           <div className="space-y-1">
-            <div className="text-lg font-bold text-green-600 dark:text-green-400">{formatCurrency(totalIncomeUSD, 'USD')}</div>
-            <div className="text-xs text-green-600 dark:text-green-400">{formatCurrency(totalIncomeKHR, 'KHR')}</div>
+            <div className="text-lg font-bold text-emerald-600 dark:text-emerald-400">{formatCurrency(totalIncomeUSD, 'USD')}</div>
+            <div className="text-xs text-emerald-600 dark:text-emerald-400">{formatCurrency(totalIncomeKHR, 'KHR')}</div>
           </div>
         </div>
         <div className="text-center p-3 bg-slate-50 dark:bg-slate-700/50 rounded-lg border border-slate-200 dark:border-slate-600">
           <p className="text-xs text-slate-600 dark:text-slate-400 mb-1">Expenses</p>
           <div className="space-y-1">
-            <div className="text-lg font-bold text-red-600 dark:text-red-400">{formatCurrency(totalExpensesUSD, 'USD')}</div>
-            <div className="text-xs text-red-600 dark:text-red-400">{formatCurrency(totalExpensesKHR, 'KHR')}</div>
+            <div className="text-lg font-bold text-rose-500 dark:text-rose-400">{formatCurrency(totalExpensesUSD, 'USD')}</div>
+            <div className="text-xs text-rose-500 dark:text-rose-400">{formatCurrency(totalExpensesKHR, 'KHR')}</div>
           </div>
         </div>
       </div>

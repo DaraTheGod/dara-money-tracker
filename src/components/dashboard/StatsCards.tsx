@@ -28,51 +28,51 @@ const StatsCards = () => {
 
   return (
     <div className="grid gap-6 md:grid-cols-3">
-      <Card className="bg-white dark:bg-slate-800 backdrop-blur-sm border border-slate-200 dark:border-slate-700 shadow-lg hover:shadow-xl transition-all duration-300">
+      <Card className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-lg hover:shadow-xl transition-all duration-300">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium text-slate-600 dark:text-slate-400">Total Balance</CardTitle>
-          <Wallet className="h-5 w-5 text-blue-500 dark:text-blue-400" />
+          <Wallet className="h-5 w-5 text-slate-500 dark:text-slate-400" />
         </CardHeader>
         <CardContent>
           <div className="space-y-1">
-            <div className={`text-2xl font-bold ${balanceUSD >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+            <div className={`text-2xl font-bold ${balanceUSD >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-500 dark:text-rose-400'}`}>
               {formatCurrency(balanceUSD, 'USD')}
             </div>
-            <div className={`text-sm ${balanceKHR >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+            <div className={`text-sm ${balanceKHR >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-500 dark:text-rose-400'}`}>
               {formatCurrency(balanceKHR, 'KHR')}
             </div>
           </div>
         </CardContent>
       </Card>
 
-      <Card className="bg-white dark:bg-slate-800 backdrop-blur-sm border border-slate-200 dark:border-slate-700 shadow-lg hover:shadow-xl transition-all duration-300">
+      <Card className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-lg hover:shadow-xl transition-all duration-300">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium text-slate-600 dark:text-slate-400">Total Income</CardTitle>
-          <TrendingUp className="h-5 w-5 text-green-500 dark:text-green-400" />
+          <TrendingUp className="h-5 w-5 text-emerald-500 dark:text-emerald-400" />
         </CardHeader>
         <CardContent>
           <div className="space-y-1">
-            <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+            <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
               {formatCurrency(totalIncomeUSD, 'USD')}
             </div>
-            <div className="text-sm text-green-600 dark:text-green-400">
+            <div className="text-sm text-emerald-600 dark:text-emerald-400">
               {formatCurrency(totalIncomeKHR, 'KHR')}
             </div>
           </div>
         </CardContent>
       </Card>
 
-      <Card className="bg-white dark:bg-slate-800 backdrop-blur-sm border border-slate-200 dark:border-slate-700 shadow-lg hover:shadow-xl transition-all duration-300">
+      <Card className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-lg hover:shadow-xl transition-all duration-300">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium text-slate-600 dark:text-slate-400">Total Expenses</CardTitle>
-          <TrendingDown className="h-5 w-5 text-red-500 dark:text-red-400" />
+          <TrendingDown className="h-5 w-5 text-rose-500 dark:text-rose-400" />
         </CardHeader>
         <CardContent>
           <div className="space-y-1">
-            <div className="text-2xl font-bold text-red-600 dark:text-red-400">
+            <div className="text-2xl font-bold text-rose-500 dark:text-rose-400">
               {formatCurrency(totalExpenseUSD, 'USD')}
             </div>
-            <div className="text-sm text-red-600 dark:text-red-400">
+            <div className="text-sm text-rose-500 dark:text-rose-400">
               {formatCurrency(totalExpenseKHR, 'KHR')}
             </div>
           </div>
