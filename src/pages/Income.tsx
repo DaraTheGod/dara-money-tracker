@@ -8,6 +8,7 @@ import IncomeList from '@/components/income/IncomeList';
 import IncomeChart from '@/components/income/IncomeChart';
 import TransactionModal from '@/components/modals/TransactionModal';
 import FilterDropdown from '@/components/common/FilterDropdown';
+import PaginatedTransactionList from '@/components/common/PaginatedTransactionList';
 import { formatCurrency } from '@/utils/currency';
 
 const Income = () => {
@@ -56,7 +57,7 @@ const Income = () => {
                   {formatCurrency(totalIncomeKHR, 'KHR')}
                 </div>
               </div>
-              <IncomeList />
+              <PaginatedTransactionList type="income" maxRows={3} />
             </CardContent>
           </Card>
 

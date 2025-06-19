@@ -57,10 +57,10 @@ const ExpenseChart = ({ type, dateRange }: ExpenseChartProps) => {
             <div className="flex justify-between items-center">
               <span className="text-sm text-gray-600 dark:text-gray-400">Total:</span>
               <div className="text-right">
-                <div className="font-semibold text-red-600 dark:text-red-400">
+                <div className="font-semibold text-red-500 dark:text-red-400">
                   {formatCurrency(data.usdAmount, 'USD')}
                 </div>
-                <div className="text-xs text-red-500 dark:text-red-400">
+                <div className="text-xs text-red-400 dark:text-red-400">
                   {formatCurrency(data.khrAmount, 'KHR')}
                 </div>
               </div>
@@ -77,7 +77,7 @@ const ExpenseChart = ({ type, dateRange }: ExpenseChartProps) => {
                         <span className="text-gray-700 dark:text-gray-300 truncate mr-2">
                           {transaction.description || 'No description'}
                         </span>
-                        <span className="text-red-600 dark:text-red-400 font-medium">
+                        <span className="text-red-500 dark:text-red-400 font-medium">
                           {formatCurrency(Number(transaction.amount), transaction.currency)}
                         </span>
                       </div>
@@ -120,15 +120,15 @@ const ExpenseChart = ({ type, dateRange }: ExpenseChartProps) => {
           />
           <Tooltip content={<CustomTooltip />} />
           {type === 'bar' ? (
-            <Bar dataKey="amount" fill="#dc2626" radius={[2, 2, 0, 0]} />
+            <Bar dataKey="amount" fill="#ef4444" radius={[2, 2, 0, 0]} />
           ) : (
             <Line 
               type="monotone" 
               dataKey="amount" 
-              stroke="#dc2626" 
+              stroke="#ef4444" 
               strokeWidth={2}
-              dot={{ fill: '#dc2626', strokeWidth: 2, r: 4 }}
-              activeDot={{ r: 6, fill: '#dc2626' }}
+              dot={{ fill: '#ef4444', strokeWidth: 2, r: 4 }}
+              activeDot={{ r: 6, fill: '#ef4444' }}
             />
           )}
         </Chart>

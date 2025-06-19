@@ -8,6 +8,7 @@ import ExpenseList from '@/components/expenses/ExpenseList';
 import ExpenseChart from '@/components/expenses/ExpenseChart';
 import TransactionModal from '@/components/modals/TransactionModal';
 import FilterDropdown from '@/components/common/FilterDropdown';
+import PaginatedTransactionList from '@/components/common/PaginatedTransactionList';
 import { formatCurrency } from '@/utils/currency';
 
 const Expenses = () => {
@@ -34,7 +35,7 @@ const Expenses = () => {
           </div>
           <Button 
             onClick={() => setIsModalOpen(true)} 
-            className="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white"
+            className="w-full sm:w-auto bg-red-500 hover:bg-red-600 text-white"
           >
             <Plus className="h-4 w-4 mr-2" />
             Add Expense
@@ -49,14 +50,14 @@ const Expenses = () => {
             </CardHeader>
             <CardContent>
               <div className="mb-4 space-y-1">
-                <div className="text-2xl font-bold text-red-600">
+                <div className="text-2xl font-bold text-red-500">
                   {formatCurrency(totalExpenseUSD, 'USD')}
                 </div>
-                <div className="text-sm text-red-600">
+                <div className="text-sm text-red-500">
                   {formatCurrency(totalExpenseKHR, 'KHR')}
                 </div>
               </div>
-              <ExpenseList />
+              <PaginatedTransactionList type="expense" maxRows={3} />
             </CardContent>
           </Card>
 
