@@ -33,7 +33,7 @@ const Income = () => {
         </div>
         <Button 
           onClick={() => setIsModalOpen(true)} 
-          className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white"
+          className="w-full sm:w-auto bg-income hover:bg-emerald-700 text-white"
         >
           <Plus className="h-4 w-4 mr-2" />
           Add Income
@@ -44,14 +44,14 @@ const Income = () => {
         <Card className="bg-card border shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-lg font-semibold text-card-foreground">Recent Income</CardTitle>
-            <TrendingUp className="h-5 w-5 text-emerald-500" />
+            <TrendingUp className="h-5 w-5 text-income" />
           </CardHeader>
           <CardContent>
             <div className="mb-4 space-y-1">
-              <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
+              <div className="text-2xl font-bold text-income">
                 {formatCurrency(totalIncomeUSD, 'USD')}
               </div>
-              <div className="text-sm text-emerald-600 dark:text-emerald-400">
+              <div className="text-sm text-income">
                 {formatCurrency(totalIncomeKHR, 'KHR')}
               </div>
             </div>

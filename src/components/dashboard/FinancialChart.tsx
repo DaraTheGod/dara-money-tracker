@@ -67,10 +67,10 @@ const FinancialChart = () => {
       <div className="text-center p-4 bg-muted rounded-lg border">
         <h4 className="text-sm font-medium text-muted-foreground mb-2">Total Balance</h4>
         <div className="space-y-1">
-          <div className={`text-2xl font-bold ${balanceUSD >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400'}`}>
+          <div className={`text-2xl font-bold ${balanceUSD >= 0 ? 'text-income' : 'text-expense'}`}>
             {formatCurrency(balanceUSD, 'USD')}
           </div>
-          <div className={`text-sm ${balanceKHR >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400'}`}>
+          <div className={`text-sm ${balanceKHR >= 0 ? 'text-income' : 'text-expense'}`}>
             {formatCurrency(balanceKHR, 'KHR')}
           </div>
         </div>
@@ -102,13 +102,13 @@ const FinancialChart = () => {
       <div className="grid grid-cols-2 gap-3">
         <div className="text-center p-3 bg-muted rounded-lg border">
           <p className="text-xs text-muted-foreground mb-1">Income</p>
-          <div className="text-lg font-bold text-emerald-600 dark:text-emerald-400">
+          <div className="text-lg font-bold text-income">
             {formatCurrency(totalIncomeUSD, 'USD')}
           </div>
         </div>
         <div className="text-center p-3 bg-muted rounded-lg border">
           <p className="text-xs text-muted-foreground mb-1">Expenses</p>
-          <div className="text-lg font-bold text-red-500 dark:text-red-400">
+          <div className="text-lg font-bold text-expense">
             {formatCurrency(totalExpensesUSD, 'USD')}
           </div>
         </div>

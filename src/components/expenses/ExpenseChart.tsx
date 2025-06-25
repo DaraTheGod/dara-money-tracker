@@ -51,43 +51,43 @@ const ExpenseChart = ({ type, dateRange }: ExpenseChartProps) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
-        <div className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 min-w-64 z-50">
-          <p className="font-semibold text-slate-900 dark:text-slate-100 mb-2">{label}</p>
+        <div className="bg-card p-4 rounded-lg shadow-lg border min-w-64 z-50">
+          <p className="font-semibold text-card-foreground mb-2">{label}</p>
           <div className="space-y-2">
             <div className="flex justify-between items-center">
-              <span className="text-sm text-slate-600 dark:text-slate-400">Total:</span>
+              <span className="text-sm text-muted-foreground">Total:</span>
               <div className="text-right">
-                <div className="font-semibold text-rose-500 dark:text-rose-400">
+                <div className="font-semibold text-expense">
                   {formatCurrency(data.usdAmount, 'USD')}
                 </div>
-                <div className="text-xs text-rose-400 dark:text-rose-400">
+                <div className="text-xs text-expense">
                   {formatCurrency(data.khrAmount, 'KHR')}
                 </div>
               </div>
             </div>
             {data.transactions.length > 0 && (
-              <div className="border-t border-slate-200 dark:border-slate-600 pt-2">
-                <p className="text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">
+              <div className="border-t pt-2">
+                <p className="text-xs font-medium text-muted-foreground mb-1">
                   {data.count} transaction{data.count !== 1 ? 's' : ''}:
                 </p>
                 <div className="max-h-24 overflow-y-auto space-y-1">
                   {data.transactions.slice(0, 3).map((transaction: any, index: number) => (
                     <div key={index} className="text-xs">
                       <div className="flex justify-between">
-                        <span className="text-slate-700 dark:text-slate-300 truncate mr-2">
+                        <span className="text-foreground truncate mr-2">
                           {transaction.description || 'No description'}
                         </span>
-                        <span className="text-rose-500 dark:text-rose-400 font-medium">
+                        <span className="text-expense font-medium">
                           {formatCurrency(Number(transaction.amount), transaction.currency)}
                         </span>
                       </div>
-                      <div className="text-slate-500 dark:text-slate-400">
+                      <div className="text-muted-foreground">
                         {format(new Date(transaction.transaction_date), 'MMM d, yyyy')}
                       </div>
                     </div>
                   ))}
                   {data.transactions.length > 3 && (
-                    <div className="text-xs text-slate-500 dark:text-slate-400">
+                    <div className="text-xs text-muted-foreground">
                       +{data.transactions.length - 3} more...
                     </div>
                   )}
@@ -107,30 +107,28 @@ const ExpenseChart = ({ type, dateRange }: ExpenseChartProps) => {
     <div className="h-64 w-full">
       <ResponsiveContainer width="100%" height="100%">
         <Chart data={chartData}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" className="dark:stroke-slate-600" />
+          <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
           <XAxis 
             dataKey="date" 
-            stroke="#64748b" 
-            className="dark:stroke-slate-400"
+            className="text-muted-foreground"
             fontSize={12}
           />
           <YAxis 
-            stroke="#64748b" 
-            className="dark:stroke-slate-400"
+            className="text-muted-foreground"
             fontSize={12}
             tickFormatter={(value) => `$${value.toFixed(0)}`}
           />
           <Tooltip content={<CustomTooltip />} />
           {type === 'bar' ? (
-            <Bar dataKey="amount" fill="#f43f5e" radius={[2, 2, 0, 0]} />
+            <Bar dataKey="amount" fill="#ef4444" radius={[2, 2, 0, 0]} />
           ) : (
             <Line 
               type="monotone" 
               dataKey="amount" 
-              stroke="#f43f5e" 
+              stroke="#ef4444" 
               strokeWidth={2}
-              dot={{ fill: '#f43f5e', strokeWidth: 2, r: 4 }}
-              activeDot={{ r: 6, fill: '#f43f5e' }}
+              dot={{ fill: '#ef4444', strokeWidth: 2, r: 4 }}
+              activeDot={{ r: 6, fill: '#ef4444' }}
             />
           )}
         </Chart>

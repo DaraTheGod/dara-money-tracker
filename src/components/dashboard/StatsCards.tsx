@@ -35,10 +35,10 @@ const StatsCards = () => {
         </CardHeader>
         <CardContent>
           <div className="space-y-1">
-            <div className={`text-2xl font-bold ${balanceUSD >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400'}`}>
+            <div className={`text-2xl font-bold ${balanceUSD >= 0 ? 'text-income' : 'text-expense'}`}>
               {formatCurrency(balanceUSD, 'USD')}
             </div>
-            <div className={`text-sm ${balanceKHR >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400'}`}>
+            <div className={`text-sm ${balanceKHR >= 0 ? 'text-income' : 'text-expense'}`}>
               {formatCurrency(balanceKHR, 'KHR')}
             </div>
           </div>
@@ -48,14 +48,14 @@ const StatsCards = () => {
       <Card className="bg-card border shadow-sm">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium text-muted-foreground">Total Income</CardTitle>
-          <TrendingUp className="h-5 w-5 text-emerald-500" />
+          <TrendingUp className="h-5 w-5 text-income" />
         </CardHeader>
         <CardContent>
           <div className="space-y-1">
-            <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
+            <div className="text-2xl font-bold text-income">
               {formatCurrency(totalIncomeUSD, 'USD')}
             </div>
-            <div className="text-sm text-emerald-600 dark:text-emerald-400">
+            <div className="text-sm text-income">
               {formatCurrency(totalIncomeKHR, 'KHR')}
             </div>
           </div>
@@ -65,14 +65,14 @@ const StatsCards = () => {
       <Card className="bg-card border shadow-sm">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium text-muted-foreground">Total Expenses</CardTitle>
-          <TrendingDown className="h-5 w-5 text-red-500" />
+          <TrendingDown className="h-5 w-5 text-expense" />
         </CardHeader>
         <CardContent>
           <div className="space-y-1">
-            <div className="text-2xl font-bold text-red-500 dark:text-red-400">
+            <div className="text-2xl font-bold text-expense">
               {formatCurrency(totalExpenseUSD, 'USD')}
             </div>
-            <div className="text-sm text-red-500 dark:text-red-400">
+            <div className="text-sm text-expense">
               {formatCurrency(totalExpenseKHR, 'KHR')}
             </div>
           </div>

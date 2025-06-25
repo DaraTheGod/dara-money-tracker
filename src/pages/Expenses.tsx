@@ -33,7 +33,7 @@ const Expenses = () => {
         </div>
         <Button 
           onClick={() => setIsModalOpen(true)} 
-          className="w-full sm:w-auto bg-red-500 hover:bg-red-600 text-white"
+          className="w-full sm:w-auto bg-expense hover:bg-red-600 text-white"
         >
           <Plus className="h-4 w-4 mr-2" />
           Add Expense
@@ -44,14 +44,14 @@ const Expenses = () => {
         <Card className="bg-card border shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-lg font-semibold text-card-foreground">Recent Expenses</CardTitle>
-            <TrendingDown className="h-5 w-5 text-red-500" />
+            <TrendingDown className="h-5 w-5 text-expense" />
           </CardHeader>
           <CardContent>
             <div className="mb-4 space-y-1">
-              <div className="text-2xl font-bold text-red-500 dark:text-red-400">
+              <div className="text-2xl font-bold text-expense">
                 {formatCurrency(totalExpenseUSD, 'USD')}
               </div>
-              <div className="text-sm text-red-500 dark:text-red-400">
+              <div className="text-sm text-expense">
                 {formatCurrency(totalExpenseKHR, 'KHR')}
               </div>
             </div>

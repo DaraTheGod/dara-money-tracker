@@ -57,7 +57,7 @@ const PaginatedTransactionList = ({ type, showBadges = false, maxRows = 5 }: Pag
 
   if (!allTransactions?.length) {
     return (
-      <div className="text-center py-8 text-slate-500 dark:text-slate-400">
+      <div className="text-center py-8 text-muted-foreground">
         <p>No transactions found</p>
         <p className="text-sm">Start by adding your first transaction</p>
       </div>
@@ -72,11 +72,11 @@ const PaginatedTransactionList = ({ type, showBadges = false, maxRows = 5 }: Pag
           {displayTransactions.map((transaction) => (
             <div 
               key={transaction.id} 
-              className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-700 rounded-lg border border-slate-200 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-650 transition-colors"
+              className="flex items-center justify-between p-3 bg-muted rounded-lg border hover:bg-accent transition-colors"
             >
               <div className="flex-1">
                 <div className="flex items-center justify-between">
-                  <p className="font-medium text-slate-900 dark:text-slate-100 text-sm">
+                  <p className="font-medium text-foreground text-sm">
                     {transaction.description || 'No description'}
                   </p>
                   <div className="flex items-center space-x-2">
@@ -85,30 +85,30 @@ const PaginatedTransactionList = ({ type, showBadges = false, maxRows = 5 }: Pag
                         variant={transaction.type === 'income' ? 'default' : 'destructive'}
                         className={transaction.type === 'income' 
                           ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200' 
-                          : 'bg-rose-100 text-rose-800 dark:bg-rose-900 dark:text-rose-200'
+                          : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
                         }
                       >
                         {transaction.type === 'income' ? '+' : '-'}{formatCurrency(Number(transaction.amount), transaction.currency as 'USD' | 'KHR')}
                       </Badge>
                     ) : (
-                      <span className={`font-semibold text-sm ${transaction.type === 'income' ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-500 dark:text-rose-400'}`}>
+                      <span className={`font-semibold text-sm ${transaction.type === 'income' ? 'text-income' : 'text-expense'}`}>
                         {formatCurrency(Number(transaction.amount), transaction.currency as 'USD' | 'KHR')}
                       </span>
                     )}
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200">
+                        <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground">
                           <MoreHorizontal className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 z-50">
-                        <DropdownMenuItem onClick={() => setEditingTransaction(transaction)} className="text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">
+                      <DropdownMenuContent align="end" className="bg-card border z-50">
+                        <DropdownMenuItem onClick={() => setEditingTransaction(transaction)} className="text-foreground hover:bg-accent">
                           <Edit className="h-4 w-4 mr-2" />
                           Edit
                         </DropdownMenuItem>
                         <DropdownMenuItem 
                           onClick={() => setDeletingId(transaction.id)}
-                          className="text-rose-600 dark:text-rose-400 hover:bg-slate-100 dark:hover:bg-slate-700"
+                          className="text-expense hover:bg-accent"
                         >
                           <Trash2 className="h-4 w-4 mr-2" />
                           Delete
@@ -117,7 +117,7 @@ const PaginatedTransactionList = ({ type, showBadges = false, maxRows = 5 }: Pag
                     </DropdownMenu>
                   </div>
                 </div>
-                <div className="flex items-center space-x-2 text-xs text-slate-500 dark:text-slate-400 mt-1">
+                <div className="flex items-center space-x-2 text-xs text-muted-foreground mt-1">
                   <span>{transaction.categories?.name || 'Uncategorized'}</span>
                   <span>•</span>
                   <span>{formatDate(transaction.transaction_date)}</span>
@@ -128,8 +128,8 @@ const PaginatedTransactionList = ({ type, showBadges = false, maxRows = 5 }: Pag
         </div>
         
         {hasMore && (
-          <div className="text-center pt-2 border-t border-slate-200 dark:border-slate-600">
-            <p className="text-xs text-slate-500 dark:text-slate-400">
+          <div className="text-center pt-2 border-t">
+            <p className="text-xs text-muted-foreground">
               Showing {maxRows} of {allTransactions.length} transactions
             </p>
           </div>
