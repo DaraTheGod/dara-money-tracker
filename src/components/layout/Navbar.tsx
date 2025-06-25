@@ -26,11 +26,11 @@ const Navbar = () => {
 
   return (
     <>
-      <nav className="bg-white/95 dark:bg-slate-800/95 backdrop-blur-md shadow-lg border-b border-slate-200 dark:border-slate-700">
+      <nav className="bg-card/95 backdrop-blur-md shadow-sm border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
-              <Link to="/" className="text-xl font-bold text-slate-800 dark:text-slate-200">
+              <Link to="/" className="text-xl font-bold text-foreground">
                 Money Tracker
               </Link>
             </div>
@@ -41,10 +41,10 @@ const Navbar = () => {
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                     isActive(item.path)
-                      ? 'bg-slate-600 text-white shadow-lg'
-                      : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
+                      ? 'bg-primary text-primary-foreground'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-accent'
                   }`}
                 >
                   {item.name}
@@ -55,7 +55,7 @@ const Navbar = () => {
                 variant="ghost"
                 size="sm"
                 onClick={toggleTheme}
-                className="ml-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700"
+                className="ml-2 rounded-lg"
               >
                 {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
               </Button>
@@ -63,7 +63,7 @@ const Navbar = () => {
               <Button 
                 variant="outline" 
                 onClick={signOut}
-                className="rounded-full border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700"
+                className="rounded-lg"
               >
                 Sign Out
               </Button>
@@ -75,7 +75,7 @@ const Navbar = () => {
                 variant="ghost"
                 size="sm"
                 onClick={toggleTheme}
-                className="rounded-full"
+                className="rounded-lg"
               >
                 {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
               </Button>
@@ -83,7 +83,7 @@ const Navbar = () => {
               <Button
                 variant="ghost"
                 onClick={() => setIsMobileMenuOpen(true)}
-                className="rounded-full"
+                className="rounded-lg"
               >
                 <Menu className="h-6 w-6" />
               </Button>
