@@ -6,21 +6,19 @@ import FinancialChart from '@/components/dashboard/FinancialChart';
 
 const Dashboard = () => {
   return (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-7xl mx-auto space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
-          <p className="text-muted-foreground">Welcome back! Here's your financial overview.</p>
-        </div>
-        
-        <StatsCards />
-        
-        <div className="grid gap-6 lg:grid-cols-2">
-          <RecentTransactions />
-          <div className="bg-card p-6 rounded-xl border border-border shadow-sm">
-            <h3 className="text-lg font-semibold mb-4 text-card-foreground">Financial Overview</h3>
-            <FinancialChart />
-          </div>
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
+        <p className="text-muted-foreground">Welcome back! Here's your financial overview.</p>
+      </div>
+      
+      <StatsCards />
+      
+      <div className="grid gap-6 lg:grid-cols-2">
+        <RecentTransactions />
+        <div className="bg-card p-6 rounded-xl border border-border shadow-sm">
+          <h3 className="text-lg font-semibold mb-4 text-card-foreground">Financial Overview</h3>
+          <FinancialChart />
         </div>
       </div>
     </div>
