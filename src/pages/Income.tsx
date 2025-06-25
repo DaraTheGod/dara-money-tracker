@@ -41,7 +41,7 @@ const Income = () => {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
-        <Card className="bg-card border border-border shadow-sm">
+        <Card className="bg-card border shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-lg font-semibold text-card-foreground">Recent Income</CardTitle>
             <TrendingUp className="h-5 w-5 text-emerald-500" />
@@ -59,7 +59,7 @@ const Income = () => {
           </CardContent>
         </Card>
 
-        <Card className="lg:col-span-2 bg-card border border-border shadow-sm">
+        <Card className="lg:col-span-2 bg-card border shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-lg font-semibold text-card-foreground">Income Trends</CardTitle>
             <div className="flex items-center space-x-2">

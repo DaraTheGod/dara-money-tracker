@@ -5,7 +5,7 @@
 
 @layer base {
   :root {
-    /* Light mode - Clean professional theme */
+    /* Light mode - Clean and professional */
     --background: 255 255 255;
     --foreground: 15 23 42;
 
@@ -16,9 +16,9 @@
     --popover-foreground: 15 23 42;
 
     --primary: 71 85 105;
-    --primary-foreground: 248 250 252;
+    --primary-foreground: 255 255 255;
 
-    --secondary: 248 250 252;
+    --secondary: 241 245 249;
     --secondary-foreground: 71 85 105;
 
     --muted: 248 250 252;
@@ -31,41 +31,41 @@
     --destructive-foreground: 255 255 255;
 
     --border: 226 232 240;
-    --input: 241 245 249;
+    --input: 255 255 255;
     --ring: 71 85 105;
 
     --radius: 0.5rem;
   }
 
   .dark {
-    /* Dark mode - Clean professional theme */
-    --background: 15 23 42;
+    /* Dark mode - Clean and professional */
+    --background: 2 6 23;
     --foreground: 248 250 252;
 
-    --card: 30 41 59;
+    --card: 15 23 42;
     --card-foreground: 248 250 252;
 
-    --popover: 30 41 59;
+    --popover: 15 23 42;
     --popover-foreground: 248 250 252;
 
-    --primary: 148 163 184;
+    --primary: 100 116 139;
     --primary-foreground: 15 23 42;
 
-    --secondary: 51 65 85;
+    --secondary: 30 41 59;
     --secondary-foreground: 203 213 225;
 
-    --muted: 51 65 85;
+    --muted: 30 41 59;
     --muted-foreground: 148 163 184;
 
-    --accent: 51 65 85;
+    --accent: 30 41 59;
     --accent-foreground: 203 213 225;
 
     --destructive: 239 68 68;
     --destructive-foreground: 255 255 255;
 
-    --border: 71 85 105;
-    --input: 51 65 85;
-    --ring: 148 163 184;
+    --border: 51 65 85;
+    --input: 30 41 59;
+    --ring: 100 116 139;
   }
 }
 
@@ -90,7 +90,7 @@
   }
 
   .bg-income {
-    @apply bg-emerald-600 hover:bg-emerald-700;
+    @apply bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-600 dark:hover:bg-emerald-700;
   }
 
   /* Expense colors - Clean red */
@@ -99,7 +99,7 @@
   }
 
   .bg-expense {
-    @apply bg-red-500 hover:bg-red-600;
+    @apply bg-red-500 hover:bg-red-600 dark:bg-red-500 dark:hover:bg-red-600;
   }
 }
 

@@ -15,16 +15,8 @@ const FinancialChart = () => {
     .filter(t => t.type === 'income' && t.currency === 'USD')
     .reduce((sum, t) => sum + Number(t.amount), 0);
 
-  const totalIncomeKHR = transactions
-    .filter(t => t.type === 'income' && t.currency === 'KHR')
-    .reduce((sum, t) => sum + Number(t.amount), 0);
-
   const totalExpensesUSD = transactions
     .filter(t => t.type === 'expense' && t.currency === 'USD')
-    .reduce((sum, t) => sum + Number(t.amount), 0);
-
-  const totalExpensesKHR = transactions
-    .filter(t => t.type === 'expense' && t.currency === 'KHR')
     .reduce((sum, t) => sum + Number(t.amount), 0);
 
   // Create data for pie chart (using USD for visualization)
@@ -58,7 +50,7 @@ const FinancialChart = () => {
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-card p-3 rounded-lg shadow-lg border border-border">
+        <div className="bg-card p-3 rounded-lg shadow-lg border">
           <p className="font-medium text-card-foreground">{payload[0].name}</p>
           <div className="text-muted-foreground">
             <div className="text-sm">{formatCurrency(payload[0].value, 'USD')}</div>
@@ -72,7 +64,7 @@ const FinancialChart = () => {
   return (
     <div className="space-y-4">
       {/* Balance Summary */}
-      <div className="text-center p-4 bg-muted rounded-lg border border-border">
+      <div className="text-center p-4 bg-muted rounded-lg border">
         <h4 className="text-sm font-medium text-muted-foreground mb-2">Total Balance</h4>
         <div className="space-y-1">
           <div className={`text-2xl font-bold ${balanceUSD >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400'}`}>
@@ -85,17 +77,14 @@ const FinancialChart = () => {
       </div>
 
       {/* Pie Chart */}
-      <ResponsiveContainer width="100%" height={250}>
+      <ResponsiveContainer width="100%" height={200}>
         <PieChart>
           <Pie
             data={filteredData}
             cx="50%"
             cy="50%"
             labelLine={false}
-            label={({ name, percent }) => 
-              `${name}: ${(percent * 100).toFixed(0)}%`
-            }
-            outerRadius={80}
+            outerRadius={60}
             fill="#8884d8"
             dataKey="value"
             stroke="none"
@@ -111,18 +100,16 @@ const FinancialChart = () => {
 
       {/* Summary Stats */}
       <div className="grid grid-cols-2 gap-3">
-        <div className="text-center p-3 bg-muted rounded-lg border border-border">
+        <div className="text-center p-3 bg-muted rounded-lg border">
           <p className="text-xs text-muted-foreground mb-1">Income</p>
-          <div className="space-y-1">
-            <div className="text-lg font-bold text-emerald-600 dark:text-emerald-400">{formatCurrency(totalIncomeUSD, 'USD')}</div>
-            <div className="text-xs text-emerald-600 dark:text-emerald-400">{formatCurrency(totalIncomeKHR, 'KHR')}</div>
+          <div className="text-lg font-bold text-emerald-600 dark:text-emerald-400">
+            {formatCurrency(totalIncomeUSD, 'USD')}
           </div>
         </div>
-        <div className="text-center p-3 bg-muted rounded-lg border border-border">
+        <div className="text-center p-3 bg-muted rounded-lg border">
           <p className="text-xs text-muted-foreground mb-1">Expenses</p>
-          <div className="space-y-1">
-            <div className="text-lg font-bold text-red-500 dark:text-red-400">{formatCurrency(totalExpensesUSD, 'USD')}</div>
-            <div className="text-xs text-red-500 dark:text-red-400">{formatCurrency(totalExpensesKHR, 'KHR')}</div>
+          <div className="text-lg font-bold text-red-500 dark:text-red-400">
+            {formatCurrency(totalExpensesUSD, 'USD')}
           </div>
         </div>
       </div>

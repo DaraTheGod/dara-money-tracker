@@ -28,7 +28,7 @@ const StatsCards = () => {
 
   return (
     <div className="grid gap-6 md:grid-cols-3">
-      <Card className="bg-card border border-border shadow-sm hover:shadow-md transition-all duration-300">
+      <Card className="bg-card border shadow-sm">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium text-muted-foreground">Total Balance</CardTitle>
           <Wallet className="h-5 w-5 text-muted-foreground" />
@@ -45,10 +45,10 @@ const StatsCards = () => {
         </CardContent>
       </Card>
 
-      <Card className="bg-card border border-border shadow-sm hover:shadow-md transition-all duration-300">
+      <Card className="bg-card border shadow-sm">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium text-muted-foreground">Total Income</CardTitle>
-          <TrendingUp className="h-5 w-5 text-emerald-500 dark:text-emerald-400" />
+          <TrendingUp className="h-5 w-5 text-emerald-500" />
         </CardHeader>
         <CardContent>
           <div className="space-y-1">
@@ -62,10 +62,10 @@ const StatsCards = () => {
         </CardContent>
       </Card>
 
-      <Card className="bg-card border border-border shadow-sm hover:shadow-md transition-all duration-300">
+      <Card className="bg-card border shadow-sm">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium text-muted-foreground">Total Expenses</CardTitle>
-          <TrendingDown className="h-5 w-5 text-red-500 dark:text-red-400" />
+          <TrendingDown className="h-5 w-5 text-red-500" />
         </CardHeader>
         <CardContent>
           <div className="space-y-1">

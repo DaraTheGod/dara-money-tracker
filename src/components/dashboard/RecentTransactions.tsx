@@ -11,7 +11,7 @@ const RecentTransactions = () => {
 
   return (
     <>
-      <Card className="bg-card border border-border shadow-sm">
+      <Card className="bg-card border shadow-sm">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="text-card-foreground">Recent Transactions</CardTitle>
           <Button 

@@ -26,7 +26,7 @@ const Navbar = () => {
 
   return (
     <>
-      <nav className="bg-card/95 backdrop-blur-md shadow-sm border-b border-border">
+      <nav className="bg-card border-b border-border shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
@@ -55,7 +55,7 @@ const Navbar = () => {
                 variant="ghost"
                 size="sm"
                 onClick={toggleTheme}
-                className="ml-2 rounded-lg"
+                className="ml-2"
               >
                 {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
               </Button>
@@ -63,7 +63,6 @@ const Navbar = () => {
               <Button 
                 variant="outline" 
                 onClick={signOut}
-                className="rounded-lg"
               >
                 Sign Out
               </Button>
@@ -75,7 +74,6 @@ const Navbar = () => {
                 variant="ghost"
                 size="sm"
                 onClick={toggleTheme}
-                className="rounded-lg"
               >
                 {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
               </Button>
@@ -83,7 +81,6 @@ const Navbar = () => {
               <Button
                 variant="ghost"
                 onClick={() => setIsMobileMenuOpen(true)}
-                className="rounded-lg"
               >
                 <Menu className="h-6 w-6" />
               </Button>
