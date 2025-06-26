@@ -51,7 +51,7 @@ const Expenses = () => {
               <div className="text-2xl font-bold text-expense">
                 {formatCurrency(totalExpenseUSD, 'USD')}
               </div>
-              <div className="text-sm text-expense">
+              <div className="text-l text-expense">
                 {formatCurrency(totalExpenseKHR, 'KHR')}
               </div>
             </div>

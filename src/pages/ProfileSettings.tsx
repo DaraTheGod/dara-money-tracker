@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -156,15 +157,14 @@ const ProfileSettings = () => {
 
       <Card className="bg-card border-border shadow-sm">
         <CardHeader>
-          <CardTitle className="text-card-foreground flex items-center gap-2">
+              <CardTitle className="text-card-foreground flex items-center gap-2">
             <User className="h-5 w-5" />
             Profile Information
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
-          {/* Profile Image Section */}
           <div className="flex flex-col items-center space-y-4">
-            <Avatar className="h-24 w-24 sm:h-32 sm:w-32">
+            <Avatar className="h-24 w-24 sm:h-16 sm:w-16">
               <AvatarImage 
                 src={profileData.profile_image} 
                 alt="Profile" 
@@ -229,7 +229,7 @@ const ProfileSettings = () => {
             <Button 
               type="submit" 
               disabled={loading}
-              className="w-full bg-income hover:bg-income/90 text-card-foreground"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white"
             >
               {loading ? (
                 "Saving..."

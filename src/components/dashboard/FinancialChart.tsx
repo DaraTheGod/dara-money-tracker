@@ -70,7 +70,7 @@ const FinancialChart = () => {
           <div className={`text-2xl font-bold ${balanceUSD >= 0 ? 'text-income' : 'text-expense'}`}>
             {formatCurrency(balanceUSD, 'USD')}
           </div>
-          <div className={`text-sm ${balanceKHR >= 0 ? 'text-income' : 'text-expense'}`}>
+          <div className={`text-l ${balanceKHR >= 0 ? 'text-income' : 'text-expense'}`}>
             {formatCurrency(balanceKHR, 'KHR')}
           </div>
         </div>

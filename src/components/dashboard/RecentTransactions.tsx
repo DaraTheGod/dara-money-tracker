@@ -17,7 +17,7 @@ const RecentTransactions = () => {
           <Button 
             onClick={() => setIsAddModalOpen(true)} 
             size="sm"
-            className="bg-primary hover:bg-primary/90 text-primary-foreground"
+            className="bg-blue-600 hover:bg-blue-700 text-white"
           >
             <Plus className="h-4 w-4 mr-2" />
             Add Transaction

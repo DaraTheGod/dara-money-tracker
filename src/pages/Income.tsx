@@ -51,7 +51,7 @@ const Income = () => {
               <div className="text-2xl font-bold text-income">
                 {formatCurrency(totalIncomeUSD, 'USD')}
               </div>
-              <div className="text-sm text-income">
+              <div className="text-l text-income">
                 {formatCurrency(totalIncomeKHR, 'KHR')}
               </div>
             </div>

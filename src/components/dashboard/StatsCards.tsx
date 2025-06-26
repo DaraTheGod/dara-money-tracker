@@ -38,7 +38,7 @@ const StatsCards = () => {
             <div className={`text-2xl font-bold ${balanceUSD >= 0 ? 'text-income' : 'text-expense'}`}>
               {formatCurrency(balanceUSD, 'USD')}
             </div>
-            <div className={`text-sm ${balanceKHR >= 0 ? 'text-income' : 'text-expense'}`}>
+            <div className={`text-l ${balanceKHR >= 0 ? 'text-income' : 'text-expense'}`}>
               {formatCurrency(balanceKHR, 'KHR')}
             </div>
           </div>
@@ -55,7 +55,7 @@ const StatsCards = () => {
             <div className="text-2xl font-bold text-income">
               {formatCurrency(totalIncomeUSD, 'USD')}
             </div>
-            <div className="text-sm text-income">
+            <div className="text-l text-income">
               {formatCurrency(totalIncomeKHR, 'KHR')}
             </div>
           </div>
@@ -72,7 +72,7 @@ const StatsCards = () => {
             <div className="text-2xl font-bold text-expense">
               {formatCurrency(totalExpenseUSD, 'USD')}
             </div>
-            <div className="text-sm text-expense">
+            <div className="text-l text-expense">
               {formatCurrency(totalExpenseKHR, 'KHR')}
             </div>
           </div>

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import { MoreHorizontal, Edit, Trash2 } from 'lucide-react';
@@ -21,14 +20,13 @@ interface PaginatedTransactionListProps {
   maxRows?: number;
 }
 
-const PaginatedTransactionList = ({ type, showBadges = false, maxRows = 5 }: PaginatedTransactionListProps) => {
+const PaginatedTransactionList = ({ type, showBadges = false, maxRows = 4 }: PaginatedTransactionListProps) => {
   const { data: allTransactions = [], refetch } = useTransactions(type);
   const [editingTransaction, setEditingTransaction] = useState(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   
   const deleteTransaction = useDeleteTransaction();
 
-  // Auto-refresh functionality
   useEffect(() => {
     const handleStorageChange = () => {
       refetch();
@@ -52,12 +50,9 @@ const PaginatedTransactionList = ({ type, showBadges = false, maxRows = 5 }: Pag
     return format(new Date(dateString), 'MMM d, yyyy');
   };
 
-  const displayTransactions = allTransactions.slice(0, maxRows);
-  const hasMore = allTransactions.length > maxRows;
-
   if (!allTransactions?.length) {
     return (
-      <div className="text-center py-8 text-muted-foreground">
+      <div className="text-center py-8 text-foreground/70">
         <p>No transactions found</p>
         <p className="text-sm">Start by adding your first transaction</p>
       </div>
@@ -67,12 +62,11 @@ const PaginatedTransactionList = ({ type, showBadges = false, maxRows = 5 }: Pag
   return (
     <>
       <div className="space-y-3">
-        {/* Fixed height container with scroll when there are exactly maxRows items */}
-        <div className={`${maxRows <= 3 ? 'max-h-48' : 'max-h-80'} overflow-y-auto pr-2 space-y-3`}>
-          {displayTransactions.map((transaction) => (
+        <div className={`${maxRows <= 3 ? 'max-h-60' : 'max-h-80'} overflow-y-auto pr-2 space-y-2`}>
+          {allTransactions.map((transaction) => (
             <div 
               key={transaction.id} 
-              className="flex items-center justify-between p-3 bg-muted rounded-lg border hover:bg-accent transition-colors"
+              className="flex items-center justify-between p-3 bg-card rounded-[var(--radius)] border border-border hover:bg-card/90 transition-colors"
             >
               <div className="flex-1">
                 <div className="flex items-center justify-between">
@@ -82,11 +76,8 @@ const PaginatedTransactionList = ({ type, showBadges = false, maxRows = 5 }: Pag
                   <div className="flex items-center space-x-2">
                     {showBadges ? (
                       <Badge 
-                        variant={transaction.type === 'income' ? 'default' : 'destructive'}
-                        className={transaction.type === 'income' 
-                          ? ' text-emerald-500  dark:text-emerald-600' 
-                          : ' text-red-500 dark:text-red-600'
-                        }
+                        variant="default"
+                        className={transaction.type === 'income' ? 'text-income text-sm' : 'text-expense text-sm'}
                       >
                         {transaction.type === 'income' ? '+' : '-'}{formatCurrency(Number(transaction.amount), transaction.currency as 'USD' | 'KHR')}
                       </Badge>
@@ -97,18 +88,18 @@ const PaginatedTransactionList = ({ type, showBadges = false, maxRows = 5 }: Pag
                     )}
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground">
+                        <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-foreground/70 hover:text-foreground">
                           <MoreHorizontal className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="bg-card border z-50">
-                        <DropdownMenuItem onClick={() => setEditingTransaction(transaction)} className="text-foreground hover:bg-accent">
+                      <DropdownMenuContent align="end" className="bg-card border border-border">
+                        <DropdownMenuItem onClick={() => setEditingTransaction(transaction)} className="text-foreground hover:bg-card/90">
                           <Edit className="h-4 w-4 mr-2" />
                           Edit
                         </DropdownMenuItem>
                         <DropdownMenuItem 
                           onClick={() => setDeletingId(transaction.id)}
-                          className="text-expense hover:bg-accent"
+                          className="text-expense hover:bg-card/90"
                         >
                           <Trash2 className="h-4 w-4 mr-2" />
                           Delete
@@ -117,7 +108,7 @@ const PaginatedTransactionList = ({ type, showBadges = false, maxRows = 5 }: Pag
                     </DropdownMenu>
                   </div>
                 </div>
-                <div className="flex items-center space-x-2 text-xs text-muted-foreground mt-1">
+                <div className="flex items-center space-x-2 text-xs text-foreground/70 mt-1">
                   <span>{transaction.categories?.name || 'Uncategorized'}</span>
                   <span>•</span>
                   <span>{formatDate(transaction.transaction_date)}</span>
@@ -127,9 +118,9 @@ const PaginatedTransactionList = ({ type, showBadges = false, maxRows = 5 }: Pag
           ))}
         </div>
         
-        {hasMore && (
-          <div className="text-center pt-2 border-t">
-            <p className="text-xs text-muted-foreground">
+        {allTransactions.length > maxRows && (
+          <div className="text-center pt-2 border-t border-border">
+            <p className="text-xs text-foreground/70">
               Showing {maxRows} of {allTransactions.length} transactions
             </p>
           </div>
