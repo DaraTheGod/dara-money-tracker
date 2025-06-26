@@ -1,71 +1,69 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    /* Light mode - Clean white with proper grays */
-    --background: 255 255 255;
-    --foreground: 15 23 42;
-
-    --card: 255 255 255;
-    --card-foreground: 15 23 42;
-
-    --popover: 255 255 255;
-    --popover-foreground: 15 23 42;
-
-    --primary: 71 85 105;
-    --primary-foreground: 255 255 255;
-
-    --secondary: 248 250 252;
-    --secondary-foreground: 71 85 105;
-
-    --muted: 248 250 252;
-    --muted-foreground: 100 116 139;
-
-    --accent: 248 250 252;
-    --accent-foreground: 71 85 105;
-
-    --destructive: 239 68 68;
-    --destructive-foreground: 255 255 255;
-
-    --border: 226 232 240;
-    --input: 255 255 255;
-    --ring: 71 85 105;
-
-    --radius: 0.5rem;
+    /* Light mode - Pure white, no yellow */
+    --background: 0 0% 100%; /* Pure white */
+    --foreground: 222 14% 10%; /* Dark charcoal */
+    --card: 0 0% 100%; /* White */
+    --card-foreground: 222 14% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 14% 10%;
+    --primary: 221 83% 53%; /* Deep blue */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 14% 96%; /* Light gray */
+    --secondary-foreground: 222 14% 30%;
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 14% 50%;
+    --accent: 220 14% 96%;
+    --accent-foreground: 222 14% 30%;
+    --destructive: 0 84% 60%; /* Clean red */
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 13% 91%; /* Light gray */
+    --input: 0 0% 100%;
+    --ring: 221 83% 53%;
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 222 14% 10%;
+    --sidebar-primary: 221 83% 53%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 14% 96%;
+    --sidebar-accent-foreground: 222 14% 30%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 221 83% 53%;
+    --radius: 0.75rem;
   }
 
   .dark {
-    /* Dark mode - Deep navy/slate with proper contrast */
-    --background: 15 23 42;
-    --foreground: 248 250 252;
-
-    --card: 30 41 59;
-    --card-foreground: 248 250 252;
-
-    --popover: 30 41 59;
-    --popover-foreground: 248 250 252;
-
-    --primary: 148 163 184;
-    --primary-foreground: 15 23 42;
-
-    --secondary: 51 65 85;
-    --secondary-foreground: 203 213 225;
-
-    --muted: 51 65 85;
-    --muted-foreground: 148 163 184;
-
-    --accent: 51 65 85;
-    --accent-foreground: 203 213 225;
-
-    --destructive: 239 68 68;
-    --destructive-foreground: 255 255 255;
-
-    --border: 71 85 105;
-    --input: 51 65 85;
-    --ring: 148 163 184;
+    /* Dark mode - Deep charcoal */
+    --background: 0 0% 10%; /* Deep charcoal */
+    --foreground: 0 0% 95%; /* Soft white */
+    --card: 0 0% 15%;
+    --card-foreground: 0 0% 95%;
+    --popover: 0 0% 15%;
+    --popover-foreground: 0 0% 95%;
+    --primary: 221 83% 60%; /* Lighter blue */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 222 14% 30%;
+    --secondary-foreground: 220 14% 85%;
+    --muted: 222 14% 30%;
+    --muted-foreground: 220 14% 65%;
+    --accent: 222 14% 30%;
+    --accent-foreground: 220 14% 85%;
+    --destructive: 0 84% 67%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 222 14% 30%;
+    --input: 0 0% 15%;
+    --ring: 221 83% 60%;
+    --sidebar-background: 0 0% 15%;
+    --sidebar-foreground: 0 0% 95%;
+    --sidebar-primary: 221 83% 60%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 222 14% 30%;
+    --sidebar-accent-foreground: 220 14% 85%;
+    --sidebar-border: 222 14% 30%;
+    --sidebar-ring: 221 83% 60%;
   }
 }
 
@@ -73,7 +71,6 @@
   * {
     @apply border-border;
   }
-
   body {
     @apply bg-background text-foreground font-sans antialiased;
   }
@@ -83,23 +80,17 @@
   .animate-slide-in-bottom {
     animation: slideInBottom 0.3s ease-out;
   }
-
-  /* Income colors - Clean green */
   .text-income {
-    @apply text-emerald-600 dark:text-emerald-400;
+    @apply text-green-600 dark:text-green-500;
   }
-
   .bg-income {
-    @apply bg-emerald-600 hover:bg-emerald-700;
+    @apply bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600;
   }
-
-  /* Expense colors - Clean red */
   .text-expense {
-    @apply text-red-500 dark:text-red-400;
+    @apply text-red-600 dark:text-red-500;
   }
-
   .bg-expense {
-    @apply bg-red-500 hover:bg-red-600;
+    @apply bg-red-600 hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600;
   }
 }
 
