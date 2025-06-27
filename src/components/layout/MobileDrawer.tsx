@@ -78,7 +78,7 @@ const MobileDrawer = ({ isOpen, onClose }: MobileDrawerProps) => {
           <Button 
             variant="outline" 
             onClick={signOut}
-            className="w-full flex items-center justify-center space-x-2"
+            className="w-full flex items-center justify-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white"
           >
             <LogOut className="h-4 w-4" />
             <span>Sign Out</span>
