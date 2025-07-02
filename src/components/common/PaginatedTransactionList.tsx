@@ -61,8 +61,8 @@ const PaginatedTransactionList = ({ type, showBadges = false, maxRows = 4 }: Pag
 
   return (
     <>
-      <div className="space-y-3">
-        <div className={`${maxRows <= 3 ? 'max-h-60' : 'max-h-80'} overflow-y-auto pr-2 space-y-2`}>
+      <div className="space-y-4">
+        <div className={`${maxRows <= 3 ? 'max-h-60' : 'max-h-100'} overflow-y-auto pr-2 space-y-2`}>
           {allTransactions.map((transaction) => (
             <div 
               key={transaction.id} 

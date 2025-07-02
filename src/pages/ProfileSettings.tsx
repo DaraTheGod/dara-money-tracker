@@ -62,32 +62,89 @@ const ProfileSettings = () => {
   };
 
   const handleFileSelect = async (file: File) => {
-    if (!user) return;
+    if (!user) {
+      toast({
+        title: "Error",
+        description: "User not authenticated",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate file type and size
+    const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    const maxSizeMB = 5;
+    if (!validTypes.includes(file.type)) {
+      toast({
+        title: "Error",
+        description: "Invalid file type. Please upload a JPG, PNG, GIF, or WebP image.",
+        variant: "destructive",
+      });
+      return;
+    }
+    if (file.size > maxSizeMB * 1024 * 1024) {
+      toast({
+        title: "Error",
+        description: `File size exceeds ${maxSizeMB}MB limit.`,
+        variant: "destructive",
+      });
+      return;
+    }
 
     const fileExt = file.name.split('.').pop();
-    const fileName = `${user.id}.${fileExt}`;
+    const fileName = `${user.id}-${Date.now()}.${fileExt}`; // Unique filename
 
     try {
       setLoading(true);
+      console.log('Uploading file:', fileName, 'Type:', file.type, 'Size:', file.size);
 
       // Upload file to Supabase Storage
-      const { error: uploadError } = await supabase.storage
+      const { data: uploadData, error: uploadError } = await supabase.storage
         .from('avatars')
-        .upload(fileName, file, { upsert: true });
+        .upload(fileName, file, {
+          upsert: true,
+          contentType: file.type,
+        });
 
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        console.error('Upload error:', uploadError);
+        throw new Error(`Upload failed: ${uploadError.message}`);
+      }
+
+      console.log('Upload response:', uploadData);
 
       // Get public URL
       const { data: urlData } = supabase.storage
         .from('avatars')
         .getPublicUrl(fileName);
 
-      const avatarUrl = urlData.publicUrl;
+      if (!urlData?.publicUrl) {
+        throw new Error('Failed to retrieve public URL');
+      }
 
-      // Update profile with new avatar URL
-      setProfileData(prev => ({
+      const avatarUrl = urlData.publicUrl;
+      console.log('Public URL:', avatarUrl);
+
+      // Update profile in Supabase
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .upsert([
+          {
+            id: user.id,
+            username: profileData.username,
+            profile_image: avatarUrl,
+          },
+        ]);
+
+      if (profileError) {
+        console.error('Profile update error:', profileError);
+        throw new Error(`Profile update failed: ${profileError.message}`);
+      }
+
+      // Update local state
+      setProfileData((prev) => ({
         ...prev,
-        profile_image: avatarUrl
+        profile_image: avatarUrl,
       }));
 
       toast({
@@ -95,10 +152,10 @@ const ProfileSettings = () => {
         description: "Profile image uploaded successfully",
       });
     } catch (error) {
-      console.error('Error uploading file:', error);
+      console.error('Error in handleFileSelect:', error);
       toast({
         title: "Error",
-        description: "Failed to upload profile image",
+        description: error.message || "Failed to upload profile image",
         variant: "destructive",
       });
     } finally {
@@ -106,11 +163,66 @@ const ProfileSettings = () => {
     }
   };
 
-  const handleFileRemove = () => {
-    setProfileData(prev => ({
-      ...prev,
-      profile_image: ''
-    }));
+  const handleFileRemove = async () => {
+    if (!user) {
+      toast({
+        title: "Error",
+        description: "User not authenticated",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      // Update profile in Supabase to clear profile_image
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .update({ profile_image: null }) // or use '' if your schema prefers an empty string
+        .eq('id', user.id);
+
+      if (profileError) {
+        console.error('Profile update error:', profileError);
+        throw new Error(`Failed to remove profile image: ${profileError.message}`);
+      }
+
+      // Optional: Delete the image file from storage
+      const currentImage = profileData.profile_image;
+      if (currentImage) {
+        const fileName = currentImage.split('/').pop(); // Extract filename from URL
+        if (fileName) {
+          const { error: deleteError } = await supabase.storage
+            .from('avatars')
+            .remove([fileName]);
+
+          if (deleteError) {
+            console.error('Storage delete error:', deleteError);
+            // Log error but don't fail the operation, as the profile update is the priority
+          }
+        }
+      }
+
+      // Update local state
+      setProfileData((prev) => ({
+        ...prev,
+        profile_image: '',
+      }));
+
+      toast({
+        title: "Success",
+        description: "Profile image removed successfully",
+      });
+    } catch (error) {
+      console.error('Error removing profile image:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to remove profile image",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -164,21 +276,21 @@ const ProfileSettings = () => {
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="flex flex-col items-center space-y-4">
-            <Avatar className="h-24 w-24 sm:h-16 sm:w-16">
+            <Avatar className="h-16 w-16 sm:h-32 sm:w-32 border-4 border-primary">
               <AvatarImage 
                 src={profileData.profile_image} 
                 alt="Profile" 
                 className="object-cover"
               />
-              <AvatarFallback className="bg-card text-card-foreground text-lg sm:text-xl">
+              <AvatarFallback className="bg-card text-card-foreground text-lg sm:text-2xl">
                 {profileData.username ? profileData.username.charAt(0).toUpperCase() : 'U'}
               </AvatarFallback>
             </Avatar>
             
             {profileData.username && (
               <div className="text-center">
-                <p className="text-card-foreground font-medium text-sm sm:text-base">{profileData.username}</p>
-                <p className="text-foreground/70 text-xs sm:text-sm">{user?.email}</p>
+                <p className="text-card-foreground font-medium text-base sm:text-lg mb-2">{profileData.username}</p>
+                <p className="text-foreground/70 text-sm sm:text-base">{user?.email}</p>
               </div>
             )}
             
@@ -210,7 +322,7 @@ const ProfileSettings = () => {
               />
             </div>
 
-            <div>
+            {/* <div>
               <Label htmlFor="email" className="text-foreground/70">Email</Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-3 h-4 w-4 text-foreground/70" />
@@ -224,7 +336,7 @@ const ProfileSettings = () => {
               <p className="text-xs text-foreground/70 mt-1">
                 Email cannot be changed from this page
               </p>
-            </div>
+            </div> */}
 
             <Button 
               type="submit" 

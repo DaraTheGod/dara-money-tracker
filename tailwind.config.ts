@@ -32,6 +32,10 @@ export default {
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)'
       },
+      maxHeight: {
+        '100': '25.5rem', // Define max-h-100 as 25rem (400px)
+        // '120': '30rem', // Optional: Add more values if needed
+      },
       keyframes: {
         'accordion-down': { from: { height: '0' }, to: { height: 'var(--radix-accordion-content-height)' } },
         'accordion-up': { from: { height: 'var(--radix-accordion-content-height)' }, to: { height: '0' } }
