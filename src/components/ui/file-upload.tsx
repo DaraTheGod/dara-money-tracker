@@ -45,7 +45,7 @@ const FileUpload = ({
   return (
     <div className="space-y-4">
       {currentFile ? (
-        <div className="relative w-32 h-32 mx-auto">
+        <div className="relative w-24 h-24 mx-auto mb-2">
           <img
             src={currentFile}
             alt="Profile"
@@ -62,7 +62,7 @@ const FileUpload = ({
         </div>
       ) : (
         <div
-          className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${
+          className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors mb-2 ${
             isDragOver
               ? 'border-blue-500 bg-blue-50 dark:bg-blue-950'
               : 'border-gray-300 dark:border-gray-600 hover:border-blue-400 dark:hover:border-blue-500'

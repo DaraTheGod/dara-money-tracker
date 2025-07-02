@@ -276,7 +276,7 @@ const ProfileSettings = () => {
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="flex flex-col items-center space-y-4">
-            <Avatar className="h-16 w-16 sm:h-32 sm:w-32 border-4 border-primary">
+            <Avatar className="h-24 w-24 sm:h-32 sm:w-32 border-4 border-primary">
               <AvatarImage 
                 src={profileData.profile_image} 
                 alt="Profile" 
@@ -294,8 +294,8 @@ const ProfileSettings = () => {
               </div>
             )}
             
-            <div className="w-full max-w-md">
-              <Label htmlFor="avatar" className="text-foreground/70 mb-2 block">
+            <div className="w-full max-w-xs sm:max-w-sm">
+              <Label htmlFor="avatar" className="text-foreground/70 mb-2 block text-sm sm:text-base">
                 Profile Image
               </Label>
               <FileUpload 
